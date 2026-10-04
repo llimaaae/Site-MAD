@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAD — Estratégia que move marcas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header><div class="wrap"><nav>
+  <a href="#" class="logo">MAD</a>
+  <div class="nav-links"><a href="#metodo">Método</a><a href="#servicos">Serviços</a><a href="#planos">Planos</a></div>
+  <a href="#diagnostico" class="btn btn-ghost">Diagnóstico gratuito</a>
+</nav></div></header>
+
+<main>
+<!-- HERO + FORMULÁRIO -->
+<div class="hero"><svg class="tri" viewBox="0 0 200 180" aria-hidden="true"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#80C6FA"/><stop offset="1" stop-color="#009FE3"/></linearGradient></defs><path d="M100 10 190 170H140L100 95 60 170H10Z" fill="url(#g)"/></svg>
+<div class="wrap hero-grid">
+  <div>
+    <p class="eyebrow">ESTRATÉGIA QUE MOVE MARCAS</p>
+    <h1>Sua empresa não precisa de sorte. <em>Precisa de método.</em></h1>
+    <p class="lead">Marketing, tecnologia e estratégia para transformar atenção em clientes.</p>
+    <div class="proof"><div><b>+3</b>frentes: tráfego, social e sites</div><div><b>100%</b>focado em resultado</div></div>
+  </div>
+
+  <div class="card" id="diagnostico">
+    <form id="form">
+      <h2>Diagnóstico gratuito</h2>
+      <small>Analisamos sua presença digital e mostramos onde crescer.</small>
+      <div class="field"><label for="nome">Nome</label><input id="nome" required placeholder="Seu nome"></div>
+      <div class="field"><label for="empresa">Empresa</label><input id="empresa" required placeholder="Nome da empresa"></div>
+      <div class="row">
+        <div class="field"><label for="whats">WhatsApp</label><input id="whats" type="tel" required placeholder="(00) 00000-0000"></div>
+        <div class="field"><label for="insta">Instagram</label><input id="insta" required placeholder="@suaempresa"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="cidade">Cidade</label><input id="cidade" placeholder="Sua cidade"></div>
+        <div class="field"><label for="invest">Investe em marketing?</label>
+          <select id="invest"><option value="">Selecione</option><option>Ainda não</option><option>Até R$ 1.000/mês</option><option>R$ 1.000 a R$ 5.000/mês</option><option>Acima de R$ 5.000/mês</option></select></div>
+      </div>
+      <div class="field"><label for="servico">O que procura?</label>
+        <select id="servico"><option value="">Selecione</option><option>Tráfego pago</option><option>Gestão de redes sociais</option><option>Criação de site</option><option>Estratégia completa</option></select></div>
+      <button class="btn btn-primary" type="submit">Analisar minha empresa →</button>
+      <p class="lgpd">Usaremos seus dados apenas para contato e elaboração do diagnóstico, conforme a LGPD.</p>
+    </form>
+    <div id="status"><h2 id="msg">Enviando...</h2><div class="loader"><i id="bar"></i></div></div>
+  </div>
+</div></div>
+
+<!-- MÉTODO -->
+<section id="metodo" class="alt"><div class="wrap">
+  <div class="title reveal"><p>O MÉTODO MAD</p><h2>Do diagnóstico ao crescimento.</h2></div>
+  <div class="grid g4">
+    <div class="box reveal"><span>01</span><h3>Diagnóstico</h3><p>Analisamos perfil, conteúdo e posicionamento da sua empresa.</p></div>
+    <div class="box reveal"><span>02</span><h3>Estratégia</h3><p>Definimos o plano ideal para o seu momento e objetivo.</p></div>
+    <div class="box reveal"><span>03</span><h3>Execução</h3><p>Conteúdo, anúncios e site rodando com consistência.</p></div>
+    <div class="box reveal"><span>04</span><h3>Resultado</h3><p>Relatórios claros e otimização contínua todo mês.</p></div>
+  </div>
+</div></section>
+
+<!-- SERVIÇOS -->
+<section id="servicos"><div class="wrap">
+  <div class="title reveal"><p>O QUE FAZEMOS</p><h2>Tudo para sua marca crescer.</h2></div>
+  <div class="grid g3">
+    <div class="box reveal"><span>▲</span><h3>Tráfego pago</h3><p>Google Ads e Meta Ads para colocar sua empresa na frente de quem procura.</p></div>
+    <div class="box reveal"><span>▲</span><h3>Social media</h3><p>Posts, reels e planejamento para construir autoridade no Instagram.</p></div>
+    <div class="box reveal"><span>▲</span><h3>Sites</h3><p>Sites e landing pages modernos, pensados para converter visitantes.</p></div>
+  </div>
+</div></section>
+
+<!-- PLANOS -->
+<section id="planos" class="alt"><div class="wrap">
+  <div class="title reveal"><p>PLANOS MENSAIS</p><h2>Escolha o nível da sua estratégia.</h2></div>
+  <div class="grid g3">
+    <div class="box plan reveal"><h3>START</h3><p>Presença digital consistente.</p><ul><li>8 posts/mês</li><li>Planejamento e design</li><li>Relatório mensal</li></ul><a href="#diagnostico" class="btn btn-ghost">Quero o START</a></div>
+    <div class="box plan feat reveal"><h3>GROW</h3><p>Acelere o crescimento.</p><ul><li>Tudo do START</li><li>12 posts/mês + Reels</li><li>Google Ads e Meta Ads</li><li>Landing page</li></ul><a href="#diagnostico" class="btn btn-primary">Quero o GROW</a></div>
+    <div class="box plan reveal"><h3>PERFORMANCE</h3><p>Estratégia completa.</p><ul><li>Tudo do GROW</li><li>Site + SEO</li><li>Maior volume de conteúdo</li><li>Consultoria estratégica</li></ul><a href="#diagnostico" class="btn btn-ghost">Quero o PERFORMANCE</a></div>
+  </div>
+</div></section>
+
+<section class="cta"><div class="wrap reveal"><h2>Transformando estratégia em crescimento.</h2><a href="#diagnostico" class="btn btn-primary">Receber meu diagnóstico →</a></div></section>
+</main>
+
+<footer><div class="wrap"><div class="logo" style="font-size:24px;margin-bottom:10px">MAD</div>© 2026 MAD. Todos os direitos reservados.</div></footer>
+
+<script src="script.js"></script>
+</body>
+</html>

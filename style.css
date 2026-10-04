@@ -1,0 +1,578 @@
+/* ==========================================================
+   MAD — style.css
+   Índice:
+   1. Variáveis e reset
+   2. Navbar
+   3. Botões
+   4. Hero
+   5. Formulário
+   6. Seções (títulos, cards, planos, CTA, rodapé)
+   7. Animação ao rolar
+   8. Responsivo (celular)
+========================================================== */
+
+
+/* ==========================================================
+   1. VARIÁVEIS E RESET
+========================================================== */
+
+/* Cores da identidade visual: mude aqui e muda no site todo */
+:root {
+    --navy: #090D18;
+    --navy-2: #0d1424;
+    --blue: #009FE3;
+    --light: #80C6FA;
+    --white: #ffffff;
+    --line: #1b2740;
+    --muted: #9aa7bc;
+    --gradient: linear-gradient(90deg, #009FE3, #80C6FA, #ffffff);
+}
+
+/* Remove margens/espaços padrão do navegador */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    overflow-x: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Títulos e logo usam Montserrat */
+h1,
+h2,
+h3,
+.logo {
+    font-family: Montserrat, Arial, sans-serif;
+}
+
+/* Centraliza o conteúdo e limita a largura */
+.wrap {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 28px;
+}
+
+
+/* ==========================================================
+   2. NAVBAR
+========================================================== */
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+
+    background: rgba(9, 13, 24, 0.7);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+nav {
+    height: 74px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -2px;
+
+    /* Texto com gradiente */
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.nav-links {
+    display: flex;
+    gap: 34px;
+
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.nav-links a:hover {
+    color: var(--white);
+}
+
+
+/* ==========================================================
+   3. BOTÕES
+========================================================== */
+
+.btn {
+    display: inline-block;
+    padding: 14px 26px;
+
+    border: 0;
+    border-radius: 6px;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Botão azul preenchido */
+.btn-primary {
+    background: var(--blue);
+    color: var(--white);
+    box-shadow: 0 0 30px rgba(0, 159, 227, 0.35);
+}
+
+.btn-primary:hover {
+    background: var(--light);
+    color: var(--navy);
+    transform: translateY(-2px);
+}
+
+/* Botão só com borda */
+.btn-ghost {
+    padding: 11px 20px;
+
+    border: 1px solid var(--blue);
+    color: var(--light);
+}
+
+.btn-ghost:hover {
+    background: var(--blue);
+    color: var(--white);
+}
+
+
+/* ==========================================================
+   4. HERO (primeira tela)
+========================================================== */
+
+.hero {
+    position: relative;
+    min-height: 100vh;
+    padding: 130px 0 80px;
+
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    /* Brilho azul no canto + fundo escuro */
+    background:
+        radial-gradient(900px 500px at 85% 10%, rgba(0, 159, 227, 0.22), transparent 60%),
+        var(--navy);
+}
+
+/* Grade sutil no fundo */
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: linear-gradient(#000, transparent 80%);
+
+    pointer-events: none;
+}
+
+/* Triângulo da marca flutuando */
+.tri {
+    position: absolute;
+    right: -120px;
+    bottom: -80px;
+    width: 620px;
+    opacity: 0.5;
+
+    animation: float 7s ease-in-out infinite;
+}
+
+@keyframes float {
+    50% {
+        transform: translateY(-22px);
+    }
+}
+
+/* Duas colunas: texto à esquerda, formulário à direita */
+.hero-grid {
+    position: relative;
+    z-index: 1;
+
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.eyebrow {
+    margin-bottom: 22px;
+
+    font-size: 12px;
+    letter-spacing: 0.35em;
+    color: var(--light);
+}
+
+h1 {
+    font-size: clamp(40px, 6vw, 76px);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+/* Parte destacada do título */
+h1 em {
+    font-style: normal;
+
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.lead {
+    max-width: 520px;
+    margin-top: 26px;
+
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+.proof {
+    margin-top: 34px;
+
+    display: flex;
+    gap: 34px;
+
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.proof b {
+    display: block;
+
+    font-family: Montserrat, sans-serif;
+    font-size: 26px;
+    color: var(--white);
+}
+
+
+/* ==========================================================
+   5. FORMULÁRIO
+========================================================== */
+
+.card {
+    padding: 30px;
+
+    background: rgba(13, 20, 36, 0.85);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 60px rgba(0, 159, 227, 0.12);
+}
+
+.card h2 {
+    margin-bottom: 4px;
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.card small {
+    display: block;
+    margin-bottom: 20px;
+
+    color: var(--muted);
+}
+
+/* Cada campo = label + input */
+.field {
+    margin-bottom: 13px;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 6px;
+
+    font-size: 12px;
+    color: #c4cfe0;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    padding: 13px;
+
+    background: var(--navy);
+    color: var(--white);
+    border: 1px solid #263450;
+    border-radius: 6px;
+
+    font: inherit;
+    outline: none;
+    transition: 0.2s;
+}
+
+/* Destaque quando o campo está selecionado */
+.field input:focus,
+.field select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0, 159, 227, 0.15);
+}
+
+/* Dois campos lado a lado */
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.card .btn {
+    width: 100%;
+    margin-top: 6px;
+}
+
+.lgpd {
+    margin-top: 12px;
+
+    font-size: 11px;
+    line-height: 1.5;
+    color: #6d7b92;
+}
+
+/* Tela de "Analisando..." (aparece depois do envio) */
+#status {
+    display: none;
+    padding: 30px 0;
+    text-align: center;
+}
+
+.loader {
+    height: 4px;
+    margin-top: 20px;
+
+    background: var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.loader i {
+    display: block;
+    width: 0;
+    height: 100%;
+
+    background: var(--gradient);
+    transition: width 2.4s ease;
+}
+
+
+/* ==========================================================
+   6. SEÇÕES
+========================================================== */
+
+section {
+    padding: 110px 0;
+}
+
+/* Fundo alternativo para separar as seções */
+.alt {
+    background: var(--navy-2);
+}
+
+/* ---------- Título de cada seção ---------- */
+
+.title {
+    max-width: 720px;
+    margin: 0 auto 56px;
+
+    text-align: center;
+}
+
+.title p {
+    margin-bottom: 14px;
+
+    font-size: 12px;
+    letter-spacing: 0.35em;
+    color: var(--blue);
+}
+
+.title h2 {
+    font-size: clamp(30px, 4.5vw, 50px);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+}
+
+/* ---------- Grades de cards ---------- */
+
+.grid {
+    display: grid;
+    gap: 18px;
+}
+
+.g3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.g4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* ---------- Card (método, serviços e planos) ---------- */
+
+.box {
+    padding: 34px;
+
+    background: var(--navy);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+
+    transition: 0.3s;
+}
+
+.box:hover {
+    border-color: var(--blue);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 159, 227, 0.1);
+}
+
+.box span {
+    font-family: Montserrat, sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--blue);
+}
+
+.box h3 {
+    margin: 30px 0 10px;
+    font-size: 22px;
+}
+
+.box p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+/* ---------- Planos ---------- */
+
+.plan h3 {
+    margin-top: 0;
+
+    letter-spacing: 0.1em;
+    color: var(--light);
+}
+
+.plan ul {
+    list-style: none;
+    margin: 22px 0;
+}
+
+.plan li {
+    padding: 7px 0;
+
+    font-size: 14px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+}
+
+/* Triângulo azul antes de cada item */
+.plan li::before {
+    content: "▲ ";
+    font-size: 9px;
+    color: var(--blue);
+}
+
+/* Plano em destaque (GROW) */
+.plan.feat {
+    border-color: var(--blue);
+    box-shadow: 0 0 50px rgba(0, 159, 227, 0.15);
+}
+
+/* ---------- Chamada final ---------- */
+
+.cta {
+    text-align: center;
+
+    background:
+        radial-gradient(600px 300px at 50% 100%, rgba(0, 159, 227, 0.25), transparent),
+        var(--navy);
+}
+
+.cta h2 {
+    margin-bottom: 28px;
+
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 900;
+    letter-spacing: -2px;
+}
+
+/* ---------- Rodapé ---------- */
+
+footer {
+    padding: 40px 0;
+
+    text-align: center;
+    font-size: 13px;
+    color: #66748b;
+    border-top: 1px solid var(--line);
+}
+
+
+/* ==========================================================
+   7. ANIMAÇÃO AO ROLAR
+   (só esconde se o JavaScript estiver ativo)
+========================================================== */
+
+.js .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: 0.8s;
+}
+
+.js .reveal.show {
+    opacity: 1;
+    transform: none;
+}
+
+
+/* ==========================================================
+   8. RESPONSIVO (telas até 900px: celular e tablet)
+========================================================== */
+
+@media (max-width: 900px) {
+
+    .hero-grid,
+    .g3,
+    .g4 {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .tri {
+        width: 380px;
+    }
+}
