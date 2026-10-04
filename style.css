@@ -393,6 +393,7 @@ h1 em {
 
 section {
     padding: 110px 0;
+    scroll-margin-top: 74px;
 }
 
 /* Fundo alternativo para separar as seções */
@@ -694,6 +695,16 @@ footer {
 /* ==========================================================
    10. EQUIPE 
 ========================================================== */
+
+/* Texto de apoio abaixo do título da seção */
+.title .sub {
+    display: block;
+    margin-top: 16px;
+
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--muted);
+}
 /* Grade da equipe: 5 colunas no computador */
 .team-grid {
     display: grid;
