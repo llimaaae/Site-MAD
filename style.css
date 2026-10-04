@@ -576,3 +576,118 @@ footer {
         width: 380px;
     }
 }
+
+/* ==========================================================
+   9. SERVIÇOS (cards com ícone e botão em pílula)
+========================================================== */
+
+.title h2 em {
+    font-style: normal;
+    color: var(--blue);
+}
+
+/* 5 colunas no computador, 2 no celular */
+.svc-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+}
+
+.svc {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 22px;
+
+    background: linear-gradient(180deg, rgba(13, 20, 36, 0.9), var(--navy));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+
+    transition: 0.3s;
+}
+
+.svc:hover {
+    border-color: var(--blue);
+    transform: translateY(-6px);
+    box-shadow: 0 14px 44px rgba(0, 159, 227, 0.14);
+}
+
+/* Ícone com brilho azul */
+.svc-icon {
+    width: 84px;
+    height: 84px;
+    margin-bottom: 26px;
+
+    filter: drop-shadow(0 10px 20px rgba(0, 159, 227, 0.35));
+}
+
+.svc h3 {
+    font-size: 17px;
+    line-height: 1.25;
+}
+
+.svc h3 span {
+    color: var(--blue);
+}
+
+/* Descrição do serviço */
+.svc p {
+    margin: 12px 0 0;
+
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+}
+/* Botão em pílula com gradiente */
+.svc-btn {
+    padding: 12px 16px;
+
+    background: linear-gradient(90deg, #009FE3, #80C6FA);
+    color: var(--navy);
+    border-radius: 999px;
+
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+
+    box-shadow: 0 0 24px rgba(0, 159, 227, 0.35);
+    transition: 0.3s;
+}
+
+.svc-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 34px rgba(0, 159, 227, 0.6);
+}
+/* Botão único abaixo dos cards */
+.svc-cta {
+    margin-top: 48px;
+    text-align: center;
+}
+
+.svc-cta .svc-btn {
+    display: inline-block;
+    padding: 16px 34px;
+    font-size: 15px;
+}
+
+/* Telas médias e celular */
+@media (max-width: 1100px) {
+    .svc-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 760px) {
+    .svc-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .svc {
+        padding: 20px 16px;
+    }
+
+    .svc-icon {
+        width: 64px;
+        height: 64px;
+    }
+}
