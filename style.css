@@ -691,3 +691,70 @@ footer {
         height: 64px;
     }
 }
+/* ==========================================================
+   10. EQUIPE 
+========================================================== */
+/* Grade da equipe: 5 colunas no computador */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+}
+
+/* Card da equipe: sem ícone, com linha de gradiente no topo */
+.team {
+    position: relative;
+    padding: 34px 22px 28px;
+
+    background: var(--navy);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+
+    transition: 0.3s;
+}
+
+/* Linha de gradiente no topo do card */
+.team::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 22px;
+    right: 22px;
+    height: 3px;
+
+    background: var(--gradient);
+    border-radius: 0 0 4px 4px;
+}
+
+.team:hover {
+    border-color: var(--blue);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 159, 227, 0.1);
+}
+
+.team h3 {
+    font-size: 18px;
+    line-height: 1.25;
+}
+
+.team p {
+    margin-top: 12px;
+
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+/* Telas médias e celular */
+@media (max-width: 1100px) {
+    .team-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 760px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
