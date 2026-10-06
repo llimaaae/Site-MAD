@@ -952,3 +952,43 @@ footer {
     height: 30px;
     margin: 0 auto 14px;
 }
+/* ==========================================================
+   13. PÁGINAS LEGAIS (política de privacidade)
+========================================================== */
+
+.legal {
+    padding: 130px 0 80px;
+}
+
+.legal-wrap {
+    max-width: 760px;
+}
+
+.legal h1 {
+    font-size: clamp(32px, 5vw, 48px);
+    letter-spacing: -1.5px;
+}
+
+.legal-date {
+    margin: 10px 0 40px;
+
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.legal h2 {
+    margin: 34px 0 10px;
+
+    font-size: 20px;
+    color: var(--light);
+}
+
+.legal p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--muted);
+}
+.footer-link {
+    color: var(--light);
+    text-decoration: underline;
+}
