@@ -514,11 +514,10 @@ section {
 /* ---------- Chamada final ---------- */
 
 .cta {
-    text-align: center;
+    padding: 70px 0;
 
-    background:
-        radial-gradient(600px 300px at 50% 100%, rgba(0, 159, 227, 0.25), transparent),
-        var(--navy);
+    text-align: center;
+    background: var(--navy-2);
 }
 
 .cta h2 {
@@ -537,7 +536,7 @@ footer {
     text-align: center;
     font-size: 13px;
     color: #66748b;
-    border-top: 1px solid var(--line);
+   
 }
 
 
@@ -1136,23 +1135,7 @@ main {
     mask-image: linear-gradient(#000 60%, transparent 100%);
 }
 
-/* Divisa curva: o topo da seção de baixo vira um arco suave */
-#metodo {
-    position: relative;
-}
 
-#metodo::before {
-    content: "";
-    position: absolute;
-    top: -50px;
-    left: -15%;
-    right: -15%;
-    height: 130px;
-
-    background: var(--navy-2);
-    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-    z-index: 0;
-}
 
 /* Conteúdo das seções fica acima do triângulo */
 section .wrap {
@@ -1171,10 +1154,6 @@ section .wrap {
         width: 420px;
     }
 
-    #metodo::before {
-        top: -40px;
-        height: 40px;
-    }
 }
 /* ==========================================================
    17. LIMPEZA VISUAL
@@ -1271,4 +1250,106 @@ h1 em {
 
 .tri {
     animation: none;
+}
+
+/* ==========================================================
+   17b. CURVAS ENTRE SEÇÕES (alternando convexa e côncava)
+========================================================== */
+
+section {
+    position: relative;
+}
+
+/* Base: o arco existe em todas as seções, mas fica escondido */
+section::before {
+    content: "";
+    display: none;
+
+    position: absolute;
+    left: -15%;
+    right: -15%;
+    height: 70px;
+
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ---------- CONVEXA: a seção sobe em arco por cima da anterior ---------- */
+
+#metodo::before,
+#equipe::before {
+    display: block;
+    top: -70px;
+
+    background: var(--navy-2);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+/* ---------- CÔNCAVA: a seção anterior desce em arco para dentro desta ---------- */
+
+#servicos::before,
+#ebook::before {
+    display: block;
+    top: -1px;
+
+    background: var(--navy-2);
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+
+@media (max-width: 900px) {
+    section::before {
+        height: 40px;
+    }
+
+    #metodo::before,
+    #equipe::before {
+        top: -40px;
+    }
+}
+/* ==========================================================
+   18. FAIXA DO PLANO ANUAL
+========================================================== */
+
+.annual {
+    margin-top: 28px;
+    padding: 22px 28px;
+
+    display: flex;
+    align-items: center;
+    gap: 24px;
+
+    background: var(--navy);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.annual-tag {
+    padding: 6px 12px;
+
+    background: rgba(0, 159, 227, 0.12);
+    border-radius: 999px;
+
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--light);
+    white-space: nowrap;
+}
+
+.annual p {
+    flex: 1;
+
+    font-size: 16px;
+    color: var(--muted);
+}
+
+.annual strong {
+    color: var(--white);
+}
+
+@media (max-width: 760px) {
+    .annual {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
 }
