@@ -992,3 +992,92 @@ footer {
     color: var(--light);
     text-decoration: underline;
 }
+/* ==========================================================
+   14. DÚVIDAS FREQUENTES
+========================================================== */
+
+.faq {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 60px;
+    align-items: start;
+}
+
+.faq-intro h2 {
+    font-size: clamp(30px, 4vw, 44px);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+}
+
+.faq-intro h2 em {
+    font-style: normal;
+    color: var(--blue);
+}
+
+.faq-intro p {
+    margin-top: 14px;
+
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+/* Cada pergunta */
+.faq-item {
+    margin-bottom: 12px;
+
+    background: var(--navy);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+
+    transition: 0.3s;
+}
+
+.faq-item[open] {
+    border-color: var(--blue);
+}
+
+.faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+
+    font-family: Montserrat, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    list-style: none;
+}
+
+/* Remove a seta padrão do navegador */
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+/* O "+" que vira "×" quando abre */
+.faq-item summary::after {
+    content: "+";
+    font-size: 24px;
+    color: var(--blue);
+    transition: 0.3s;
+}
+
+.faq-item[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.faq-item p {
+    padding: 0 22px 20px;
+
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+@media (max-width: 900px) {
+    .faq {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
