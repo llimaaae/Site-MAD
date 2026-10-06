@@ -1176,3 +1176,99 @@ section .wrap {
         height: 40px;
     }
 }
+/* ==========================================================
+   17. LIMPEZA VISUAL
+   Menos brilho, menos hover, menos gradiente.
+   Regra: um destaque só (azul) e hover apenas no que é clicável.
+========================================================== */
+
+
+/* ---------- Botões: só trocam de cor ---------- */
+
+.btn,
+.svc-btn {
+    box-shadow: none;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-primary {
+    box-shadow: none;
+}
+
+.btn-primary:hover {
+    background: var(--light);
+    color: var(--navy);
+    transform: none;
+}
+
+/* Botão do carrossel e do e-book: azul sólido, sem gradiente */
+.svc-btn {
+    background: var(--blue);
+    color: var(--white);
+}
+
+.svc-btn:hover {
+    background: var(--light);
+    color: var(--navy);
+    transform: none;
+    box-shadow: none;
+}
+
+
+/* ---------- Cards não clicáveis: sem reação ao mouse ---------- */
+
+.box:not(.feat):hover,
+.svc:hover,
+.team:hover {
+    border-color: var(--line);
+    transform: none;
+    box-shadow: none;
+}
+
+
+/* ---------- Brilhos removidos ---------- */
+
+.card {
+    box-shadow: none;
+}
+
+.svc-icon {
+    filter: none;
+}
+
+.plan.feat {
+    box-shadow: none;
+}
+
+.ebook-cover {
+    background: none;
+}
+
+.book {
+    box-shadow: -10px 16px 30px rgba(0, 0, 0, 0.45);
+}
+
+
+/* ---------- Gradiente em texto: só azul sólido ---------- */
+
+h1 em {
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    color: var(--blue);
+}
+
+.team::before {
+    background: var(--blue);
+}
+
+.loader i {
+    background: var(--blue);
+}
+
+
+/* ---------- Triângulo do hero parado ---------- */
+
+.tri {
+    animation: none;
+}
