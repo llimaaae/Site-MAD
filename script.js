@@ -81,3 +81,26 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
+/* ---------- Faixa de serviços: arrastar com o mouse ---------- */
+const trilho = document.querySelector('.svc-grid');
+let arrastando = false;
+let inicioX = 0;
+let scrollInicial = 0;
+
+trilho.addEventListener('mousedown', (e) => {
+  arrastando = true;
+  trilho.classList.add('dragging');
+  inicioX = e.pageX;
+  scrollInicial = trilho.scrollLeft;
+});
+
+window.addEventListener('mouseup', () => {
+  arrastando = false;
+  trilho.classList.remove('dragging');
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!arrastando) return;
+  e.preventDefault();
+  trilho.scrollLeft = scrollInicial - (e.pageX - inicioX);
+});
