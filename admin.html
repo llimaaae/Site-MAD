@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel MAD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin">
+  <div class="wrap">
+
+    <!-- LOGIN -->
+    <div id="login-box" class="admin-login">
+      <div class="card">
+        <img src="assets/logo.png" alt="MAD" class="logo-img admin-logo">
+        <form id="login-form">
+          <div class="field">
+            <label for="email">E-mail</label>
+            <input id="email" type="email" required autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="senha">Senha</label>
+            <input id="senha" type="password" required autocomplete="current-password">
+          </div>
+          <button class="btn btn-primary" type="submit">Entrar</button>
+          <p id="login-erro" class="admin-erro"></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- PAINEL -->
+    <div id="painel" hidden>
+      <div class="admin-top">
+        <h1>Leads</h1>
+        <button id="sair" class="btn btn-ghost" type="button">Sair</button>
+      </div>
+
+      <div class="admin-stats">
+        <div><b id="st-total">0</b><span>Total</span></div>
+        <div><b id="st-novos">0</b><span>Novos</span></div>
+        <div><b id="st-clientes">0</b><span>Clientes</span></div>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Empresa</th>
+              <th>Nome</th>
+              <th>WhatsApp</th>
+              <th>Instagram</th>
+              <th>Cidade</th>
+              <th>Investe</th>
+              <th>Procura</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="leads-body"></tbody>
+        </table>
+      </div>
+      <p id="vazio" class="admin-vazio" hidden>Nenhum lead ainda.</p>
+    </div>
+
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
