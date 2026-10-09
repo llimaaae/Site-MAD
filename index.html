@@ -106,7 +106,7 @@
       <div class="field"><label for="nome">Nome</label><input id="nome" required placeholder="Seu nome"></div>
       <div class="field"><label for="empresa">Empresa</label><input id="empresa" required placeholder="Nome da empresa"></div>
       <div class="row">
-        <div class="field"><label for="whats">WhatsApp</label><input id="whats" type="tel" required placeholder="(00) 00000-0000"></div>
+        <div class="field"><label for="whats">WhatsApp</label><input id="whats" type="tel" inputmode="numeric" maxlength="15" autocomplete="tel" required placeholder="(00) 00000-0000" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Use o formato (00) 00000-0000"></div>
         <div class="field"><label for="insta">Instagram</label><input id="insta" required placeholder="@suaempresa"></div>
       </div>
       <div class="row">

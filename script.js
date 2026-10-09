@@ -104,3 +104,22 @@ window.addEventListener('mousemove', (e) => {
   e.preventDefault();
   trilho.scrollLeft = scrollInicial - (e.pageX - inicioX);
 });
+/* ---------- Máscara do WhatsApp: só números, formato (00) 00000-0000 ---------- */
+const campoWhats = document.getElementById('whats');
+
+campoWhats.addEventListener('input', () => {
+  // Tira tudo que não for número e limita a 11 dígitos
+  let n = campoWhats.value.replace(/\D/g, '').slice(0, 11);
+
+  if (n.length > 10) {
+    n = n.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+  } else if (n.length > 6) {
+    n = n.replace(/^(\d{2})(\d{4})(\d{0,4})$/, '($1) $2-$3');
+  } else if (n.length > 2) {
+    n = n.replace(/^(\d{2})(\d{0,5})$/, '($1) $2');
+  } else if (n.length > 0) {
+    n = '(' + n;
+  }
+
+  campoWhats.value = n;
+});
