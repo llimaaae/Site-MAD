@@ -6,9 +6,19 @@
    3. Botões
    4. Hero
    5. Formulário
-   6. Seções (títulos, cards, planos, CTA, rodapé)
+   6. Seções (títulos, cards, planos, rodapé)
    7. Animação ao rolar
-   8. Responsivo (celular)
+   8. Serviços (carrossel)
+   9. Equipe
+   10. E-book
+   11. Logo (imagem)
+   12. Páginas legais
+   13. Dúvidas frequentes
+   14. Triângulo contínuo e divisa curva
+   15. Curvas entre seções
+   16. Faixa do plano anual
+   17. Painel de leads (admin)
+   18. Responsivo (celular e tablet)
 ========================================================== */
 
 
@@ -25,7 +35,6 @@
     --white: #ffffff;
     --line: #1b2740;
     --muted: #9aa7bc;
-    --gradient: linear-gradient(90deg, #009FE3, #80C6FA, #ffffff);
 }
 
 /* Remove margens/espaços padrão do navegador */
@@ -51,11 +60,10 @@ a {
     text-decoration: none;
 }
 
-/* Títulos e logo usam Montserrat */
+/* Títulos usam Montserrat */
 h1,
 h2,
-h3,
-.logo {
+h3 {
     font-family: Montserrat, Arial, sans-serif;
 }
 
@@ -91,18 +99,6 @@ nav {
     justify-content: space-between;
 }
 
-.logo {
-    font-size: 30px;
-    font-weight: 900;
-    letter-spacing: -2px;
-
-    /* Texto com gradiente */
-    background: var(--gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
 .nav-links {
     display: flex;
     gap: 34px;
@@ -132,20 +128,18 @@ nav {
     font-weight: 500;
 
     cursor: pointer;
-    transition: 0.3s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
 /* Botão azul preenchido */
 .btn-primary {
     background: var(--blue);
     color: var(--white);
-    box-shadow: 0 0 30px rgba(0, 159, 227, 0.35);
 }
 
 .btn-primary:hover {
     background: var(--light);
     color: var(--navy);
-    transform: translateY(-2px);
 }
 
 /* Botão só com borda */
@@ -168,13 +162,13 @@ nav {
 
 .hero {
     position: relative;
-        min-height: 100vh;                 /* reserva para navegadores antigos */
+    min-height: 100vh;                 /* reserva para navegadores antigos */
     min-height: calc(100svh - 110px);  /* deixa a próxima seção aparecer embaixo */
-    padding: 130px 0 80px;
+    padding: 130px 0 110px;
 
     display: flex;
     align-items: center;
-    overflow: hidden;
+    overflow: visible;                 /* o triângulo passa para a seção de baixo */
 
     /* Brilho azul no canto + fundo escuro */
     background:
@@ -197,27 +191,23 @@ nav {
     pointer-events: none;
 }
 
-/* Triângulo da marca flutuando */
+/* Triângulo da marca no fundo, descendo além do hero e se dissolvendo */
 .tri {
     position: absolute;
-    right: -120px;
-    bottom: -80px;
-    width: 620px;
+    right: -140px;
+    bottom: -200px;
+    width: 760px;
     opacity: 0.5;
+    z-index: 1;
 
-    animation: float 7s ease-in-out infinite;
-}
-
-@keyframes float {
-    50% {
-        transform: translateY(-22px);
-    }
+    -webkit-mask-image: linear-gradient(#000 60%, transparent 100%);
+    mask-image: linear-gradient(#000 60%, transparent 100%);
 }
 
 /* Duas colunas: texto à esquerda, formulário à direita */
 .hero-grid {
     position: relative;
-    z-index: 1;
+    z-index: 2;
 
     display: grid;
     grid-template-columns: 1.15fr 0.85fr;
@@ -240,14 +230,13 @@ h1 {
     letter-spacing: -2px;
 }
 
-/* Parte destacada do título */
-h1 em {
+/* Parte destacada dos títulos (azul sólido, sem gradiente) */
+h1 em,
+.title h2 em,
+.ebook-info h2 em,
+.faq-intro h2 em {
     font-style: normal;
-
-    background: var(--gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--blue);
 }
 
 .lead {
@@ -290,7 +279,6 @@ h1 em {
     border-radius: 14px;
 
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 60px rgba(0, 159, 227, 0.12);
 }
 
 .card h2 {
@@ -383,7 +371,7 @@ h1 em {
     width: 0;
     height: 100%;
 
-    background: var(--gradient);
+    background: var(--blue);
     transition: width 2.4s ease;
 }
 
@@ -393,6 +381,7 @@ h1 em {
 ========================================================== */
 
 section {
+    position: relative;
     padding: 110px 0;
     scroll-margin-top: 74px;
 }
@@ -440,7 +429,7 @@ section {
     grid-template-columns: repeat(4, 1fr);
 }
 
-/* ---------- Card (método, serviços e planos) ---------- */
+/* ---------- Card (método e planos) ---------- */
 
 .box {
     padding: 34px;
@@ -452,7 +441,8 @@ section {
     transition: 0.3s;
 }
 
-.box:hover {
+/* Só o plano em destaque reage ao mouse */
+.box.feat:hover {
     border-color: var(--blue);
     transform: translateY(-5px);
     box-shadow: 0 10px 40px rgba(0, 159, 227, 0.1);
@@ -508,7 +498,6 @@ section {
 /* Plano em destaque (GROW) */
 .plan.feat {
     border-color: var(--blue);
-    box-shadow: 0 0 50px rgba(0, 159, 227, 0.15);
 }
 
 /* ---------- Chamada final ---------- */
@@ -520,14 +509,6 @@ section {
     background: var(--navy-2);
 }
 
-.cta h2 {
-    margin-bottom: 28px;
-
-    font-size: clamp(32px, 5vw, 56px);
-    font-weight: 900;
-    letter-spacing: -2px;
-}
-
 /* ---------- Rodapé ---------- */
 
 footer {
@@ -536,7 +517,6 @@ footer {
     text-align: center;
     font-size: 13px;
     color: #66748b;
-   
 }
 
 
@@ -558,34 +538,8 @@ footer {
 
 
 /* ==========================================================
-   8. RESPONSIVO (telas até 900px: celular e tablet)
+   8. SERVIÇOS (carrossel de cards)
 ========================================================== */
-
-@media (max-width: 900px) {
-
-    .hero-grid,
-    .g3,
-    .g4 {
-        grid-template-columns: 1fr;
-    }
-
-    .nav-links {
-        display: none;
-    }
-
-    .tri {
-        width: 380px;
-    }
-}
-
-/* ==========================================================
-   9. SERVIÇOS (carrossel de cards)
-========================================================== */
-
-.title h2 em {
-    font-style: normal;
-    color: var(--blue);
-}
 
 /* Faixa horizontal que desliza */
 .svc-grid {
@@ -634,28 +588,15 @@ footer {
     transition: 0.3s;
 }
 
-.svc:hover {
-    border-color: var(--blue);
-    transform: translateY(-6px);
-    box-shadow: 0 14px 44px rgba(0, 159, 227, 0.14);
-}
-
-/* Ícone com brilho azul */
 .svc-icon {
     width: 84px;
     height: 84px;
     margin-bottom: 26px;
-
-    filter: drop-shadow(0 10px 20px rgba(0, 159, 227, 0.35));
 }
 
 .svc h3 {
     font-size: 19px;
     line-height: 1.3;
-}
-
-.svc h3 span {
-    color: var(--blue);
 }
 
 .svc p {
@@ -666,26 +607,25 @@ footer {
     color: var(--muted);
 }
 
-/* ---------- Botão em pílula com gradiente ---------- */
+/* ---------- Botão em pílula (azul sólido) ---------- */
 
 .svc-btn {
     padding: 12px 16px;
 
-    background: linear-gradient(90deg, #009FE3, #80C6FA);
-    color: var(--navy);
+    background: var(--blue);
+    color: var(--white);
     border-radius: 999px;
 
     font-size: 13px;
     font-weight: 700;
     text-align: center;
 
-    box-shadow: 0 0 24px rgba(0, 159, 227, 0.35);
-    transition: 0.3s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .svc-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 34px rgba(0, 159, 227, 0.6);
+    background: var(--light);
+    color: var(--navy);
 }
 
 /* Botão único abaixo dos cards */
@@ -700,22 +640,9 @@ footer {
     font-size: 15px;
 }
 
-/* Celular: cards um pouco menores */
-@media (max-width: 760px) {
-    .svc {
-        flex: 0 0 245px;
-        min-height: 320px;
-        padding: 26px 22px;
-    }
 
-    .svc-icon {
-        width: 68px;
-        height: 68px;
-        margin-bottom: 20px;
-    }
-}
 /* ==========================================================
-   10. EQUIPE 
+   9. EQUIPE
 ========================================================== */
 
 /* Texto de apoio abaixo do título da seção */
@@ -727,6 +654,7 @@ footer {
     line-height: 1.6;
     color: var(--muted);
 }
+
 /* Grade da equipe: 5 colunas no computador */
 .team-grid {
     display: grid;
@@ -734,7 +662,7 @@ footer {
     gap: 18px;
 }
 
-/* Card da equipe: sem ícone, com linha de gradiente no topo */
+/* Card da equipe: sem ícone, com linha azul no topo */
 .team {
     position: relative;
     padding: 34px 22px 28px;
@@ -746,7 +674,7 @@ footer {
     transition: 0.3s;
 }
 
-/* Linha de gradiente no topo do card */
+/* Linha azul no topo do card */
 .team::before {
     content: "";
     position: absolute;
@@ -755,14 +683,8 @@ footer {
     right: 22px;
     height: 3px;
 
-    background: var(--gradient);
+    background: var(--blue);
     border-radius: 0 0 4px 4px;
-}
-
-.team:hover {
-    border-color: var(--blue);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 40px rgba(0, 159, 227, 0.1);
 }
 
 .team h3 {
@@ -778,22 +700,9 @@ footer {
     color: var(--muted);
 }
 
-/* Telas médias e celular */
-@media (max-width: 1100px) {
-    .team-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 760px) {
-    .team-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-}
 
 /* ==========================================================
-   11. E-BOOK
+   10. E-BOOK
 ========================================================== */
 
 .ebook {
@@ -808,9 +717,6 @@ footer {
 .ebook-cover {
     display: flex;
     justify-content: center;
-
-    /* Brilho azul atrás do livro */
-    background: radial-gradient(closest-side, rgba(0, 159, 227, 0.25), transparent);
 }
 
 .book {
@@ -829,9 +735,7 @@ footer {
 
     /* Leve inclinação, como um livro apoiado */
     transform: perspective(900px) rotateY(-14deg);
-    box-shadow:
-        -12px 20px 50px rgba(0, 0, 0, 0.5),
-        0 0 60px rgba(0, 159, 227, 0.25);
+    box-shadow: -10px 16px 30px rgba(0, 0, 0, 0.45);
 
     overflow: hidden;
 }
@@ -897,11 +801,6 @@ footer {
     letter-spacing: -1.5px;
 }
 
-.ebook-info h2 em {
-    font-style: normal;
-    color: var(--blue);
-}
-
 .ebook-text {
     max-width: 480px;
     margin-top: 18px;
@@ -941,21 +840,9 @@ footer {
     font-size: 15px;
 }
 
-/* Celular e tablet: uma coluna */
-@media (max-width: 900px) {
-    .ebook {
-        grid-template-columns: 1fr;
-        gap: 40px;
-        text-align: center;
-    }
 
-    .ebook-text {
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
 /* ==========================================================
-   12. LOGO (imagem)
+   11. LOGO (imagem)
 ========================================================== */
 
 .logo-link {
@@ -974,8 +861,10 @@ footer {
     height: 30px;
     margin: 0 auto 14px;
 }
+
+
 /* ==========================================================
-   13. PÁGINAS LEGAIS (política de privacidade)
+   12. PÁGINAS LEGAIS (política de privacidade)
 ========================================================== */
 
 .legal {
@@ -1010,12 +899,15 @@ footer {
     line-height: 1.7;
     color: var(--muted);
 }
+
 .footer-link {
     color: var(--light);
     text-decoration: underline;
 }
+
+
 /* ==========================================================
-   14. DÚVIDAS FREQUENTES
+   13. DÚVIDAS FREQUENTES
 ========================================================== */
 
 .faq {
@@ -1029,11 +921,6 @@ footer {
     font-size: clamp(30px, 4vw, 44px);
     font-weight: 900;
     letter-spacing: -1.5px;
-}
-
-.faq-intro h2 em {
-    font-style: normal;
-    color: var(--blue);
 }
 
 .faq-intro p {
@@ -1097,14 +984,9 @@ footer {
     color: var(--muted);
 }
 
-@media (max-width: 900px) {
-    .faq {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
-}
+
 /* ==========================================================
-   16. TRIÂNGULO CONTÍNUO E DIVISA CURVA
+   14. TRIÂNGULO CONTÍNUO E DIVISA CURVA
 ========================================================== */
 
 /* Evita rolagem lateral causada pelo triângulo grande */
@@ -1112,153 +994,16 @@ main {
     overflow-x: clip;
 }
 
-/* O hero deixa o triângulo passar para a seção de baixo */
-.hero {
-    overflow: visible;
-    padding-bottom: 110px;
-    border-bottom: 0;          /* remove a linha cinza */
-}
-
-/* Conteúdo do hero fica acima do triângulo */
-.hero-grid {
-    z-index: 2;
-}
-
-/* Triângulo maior, descendo além do hero e se dissolvendo */
-.tri {
-    right: -140px;
-    bottom: -200px;
-    width: 760px;
-    z-index: 1;
-
-    -webkit-mask-image: linear-gradient(#000 60%, transparent 100%);
-    mask-image: linear-gradient(#000 60%, transparent 100%);
-}
-
-
-
 /* Conteúdo das seções fica acima do triângulo */
 section .wrap {
     position: relative;
     z-index: 1;
 }
 
-@media (max-width: 900px) {
-    .hero {
-        padding-bottom: 80px;
-    }
-
-    .tri {
-        right: -90px;
-        bottom: -120px;
-        width: 420px;
-    }
-
-}
-/* ==========================================================
-   17. LIMPEZA VISUAL
-   Menos brilho, menos hover, menos gradiente.
-   Regra: um destaque só (azul) e hover apenas no que é clicável.
-========================================================== */
-
-
-/* ---------- Botões: só trocam de cor ---------- */
-
-.btn,
-.svc-btn {
-    box-shadow: none;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-}
-
-.btn-primary {
-    box-shadow: none;
-}
-
-.btn-primary:hover {
-    background: var(--light);
-    color: var(--navy);
-    transform: none;
-}
-
-/* Botão do carrossel e do e-book: azul sólido, sem gradiente */
-.svc-btn {
-    background: var(--blue);
-    color: var(--white);
-}
-
-.svc-btn:hover {
-    background: var(--light);
-    color: var(--navy);
-    transform: none;
-    box-shadow: none;
-}
-
-
-/* ---------- Cards não clicáveis: sem reação ao mouse ---------- */
-
-.box:not(.feat):hover,
-.svc:hover,
-.team:hover {
-    border-color: var(--line);
-    transform: none;
-    box-shadow: none;
-}
-
-
-/* ---------- Brilhos removidos ---------- */
-
-.card {
-    box-shadow: none;
-}
-
-.svc-icon {
-    filter: none;
-}
-
-.plan.feat {
-    box-shadow: none;
-}
-
-.ebook-cover {
-    background: none;
-}
-
-.book {
-    box-shadow: -10px 16px 30px rgba(0, 0, 0, 0.45);
-}
-
-
-/* ---------- Gradiente em texto: só azul sólido ---------- */
-
-h1 em {
-    background: none;
-    -webkit-background-clip: initial;
-    background-clip: initial;
-    color: var(--blue);
-}
-
-.team::before {
-    background: var(--blue);
-}
-
-.loader i {
-    background: var(--blue);
-}
-
-
-/* ---------- Triângulo do hero parado ---------- */
-
-.tri {
-    animation: none;
-}
 
 /* ==========================================================
-   17b. CURVAS ENTRE SEÇÕES (alternando convexa e côncava)
+   15. CURVAS ENTRE SEÇÕES (alternando convexa e côncava)
 ========================================================== */
-
-section {
-    position: relative;
-}
 
 /* Base: o arco existe em todas as seções, mas fica escondido */
 section::before {
@@ -1296,18 +1041,9 @@ section::before {
     border-radius: 0 0 50% 50% / 0 0 100% 100%;
 }
 
-@media (max-width: 900px) {
-    section::before {
-        height: 40px;
-    }
 
-    #metodo::before,
-    #equipe::before {
-        top: -40px;
-    }
-}
 /* ==========================================================
-   18. FAIXA DO PLANO ANUAL
+   16. FAIXA DO PLANO ANUAL
 ========================================================== */
 
 .annual {
@@ -1346,15 +1082,9 @@ section::before {
     color: var(--white);
 }
 
-@media (max-width: 760px) {
-    .annual {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-    }
-}
+
 /* ==========================================================
-   19. PAINEL DE LEADS (admin)
+   17. PAINEL DE LEADS (admin)
 ========================================================== */
 
 .admin {
@@ -1471,4 +1201,93 @@ section::before {
     margin-top: 24px;
     text-align: center;
     color: var(--muted);
+}
+
+
+/* ==========================================================
+   18. RESPONSIVO (celular e tablet)
+========================================================== */
+
+/* Tablets: a equipe passa de 5 para 3 colunas */
+@media (max-width: 1100px) {
+    .team-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+
+    /* Tudo em uma coluna */
+    .hero-grid,
+    .g3,
+    .g4 {
+        grid-template-columns: 1fr;
+    }
+
+    /* Menu de links escondido no celular */
+    .nav-links {
+        display: none;
+    }
+
+    .hero {
+        padding-bottom: 80px;
+    }
+
+    .tri {
+        right: -90px;
+        bottom: -120px;
+        width: 420px;
+    }
+
+    .ebook {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+    }
+
+    .ebook-text {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .faq {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    section::before {
+        height: 40px;
+    }
+
+    #metodo::before,
+    #equipe::before {
+        top: -40px;
+    }
+}
+
+@media (max-width: 760px) {
+
+    /* Cards de serviço um pouco menores */
+    .svc {
+        flex: 0 0 245px;
+        min-height: 320px;
+        padding: 26px 22px;
+    }
+
+    .svc-icon {
+        width: 68px;
+        height: 68px;
+        margin-bottom: 20px;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .annual {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
 }
