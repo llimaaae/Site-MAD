@@ -79,6 +79,8 @@ module.exports = async (req, res) => {
   // 2) Confere o segredo enviado pelo Supabase no cabeçalho Authorization
   const autorizacao = req.headers['authorization'] || '';
   const recebido = autorizacao.startsWith('Bearer ') ? autorizacao.slice(7) : '';
+  // LOG TEMPORÁRIO (diagnóstico do webhook) — só metadados, nunca o valor em si
+  console.log('[webhook] Authorization veio:', autorizacao !== '', '| tamanho recebido:', recebido.length, '| tamanho do segredo:', (SECRET || '').length);
   if (!segredoConfere(recebido)) return negar(res);
 
   // 3) Confere que é um INSERT na tabela de leads
