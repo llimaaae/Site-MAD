@@ -9,9 +9,17 @@
    3. Esta função valida o segredo e envia o e-mail de aviso
       para o LEAD_EMAIL.
 
+   Segurança:
+   - O Webhook do Supabase envia o segredo no cabeçalho
+     "x-webhook-secret" (em HTTP Headers, não em HTTP Parameters).
+     Se ele não vier, aceita "Authorization: Bearer ..." como alternativa.
+   - O segredo é comparado com sha256 + timingSafeEqual (sem vazar tempo).
+   - Todo campo do lead passa por escape de HTML antes de entrar no e-mail.
+   - Links de WhatsApp/Instagram só são criados se o dado for válido.
+
    Variáveis de ambiente (configuradas na Vercel, nunca no código):
    - WEBHOOK_SECRET : segredo combinado com o Webhook do Supabase
-   - RESEND_API_KEY : chave da API do Resend (começa com "re_")
+   - RESEND_API_KEY : chave da API do Resend
    - LEAD_EMAIL     : e-mail que recebe o aviso de lead novo
    - SITE_URL       : endereço do seu site (ex.: https://seu-site.vercel.app)
 ========================================================== */
