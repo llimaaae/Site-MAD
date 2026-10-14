@@ -325,10 +325,50 @@ h1 em,
 
 /* Destaque quando o campo está selecionado */
 .field input:focus,
-.field select:focus {
+.field select:focus,
+.field textarea:focus {
     border-color: var(--blue);
     box-shadow: 0 0 0 3px rgba(0, 159, 227, 0.15);
 }
+
+/* textarea */
+.field textarea {
+    width: 100%;
+    padding: 13px;
+    background: var(--navy);
+    color: var(--white);
+    border: 1px solid #263450;
+    border-radius: 6px;
+    font: inherit;
+    outline: none;
+    resize: vertical;
+    transition: 0.2s;
+}
+
+/* bloco de perguntas do Instagram */
+.insta-step {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+}
+.insta-step h3 { font-size: 16px; margin-bottom: 4px; }
+.insta-step small { display: block; margin-bottom: 14px; color: var(--muted); font-size: 12px; }
+
+/* múltipla escolha */
+.checks { display: flex; flex-wrap: wrap; gap: 10px 16px; }
+.checks label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: #c4cfe0; cursor: pointer;
+}
+.checks input { accent-color: var(--blue); }
+
+/* consentimento LGPD */
+.consent label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: #c4cfe0; cursor: pointer;
+}
+.consent input { accent-color: var(--blue); }
+.consent a { color: var(--blue); }
 
 /* Dois campos lado a lado */
 .row {

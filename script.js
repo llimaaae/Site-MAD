@@ -46,18 +46,43 @@ const bar = document.getElementById('bar');
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  // Pega o que a pessoa preencheu
+  // Pega o que a pessoa preencheu (dados de contato)
+  const conteudos = Array.from(document.querySelectorAll('input[name="igConteudo"]:checked')).map(cb => cb.value);
+
   const dados = {
     nome: nome.value.trim(),
     empresa: empresa.value.trim(),
     whatsapp: whats.value.trim(),
-    instagram: insta.value.trim(),
+    instagram: igPerfil.value.trim(),
     cidade: cidade.value.trim(),
     investimento: invest.value,
     servico: servico.value
   };
 
-  // Troca o formulário pela tela de "enviando"
+  const payloadDiag = {
+    nome: dados.nome,
+    empresa: dados.empresa,
+    whatsapp: dados.whatsapp,
+    instagram: dados.instagram,
+    cidade: dados.cidade,
+    investimento: dados.investimento,
+    servico: dados.servico,
+    seguidores: igSeg.value,
+    posts: igPosts.value,
+    bio: igBio.value.trim(),
+    conteudos: conteudos,
+    linkBio: igLink.value,
+    objetivo: igObj.value,
+    consent: document.getElementById('consent').checked
+  };
+
+  // consentimento obrigatório
+  if (!payloadDiag.consent) {
+    alert('Você precisa concordar com a Política de Privacidade para continuar.');
+    return;
+  }
+
+  // Troca o formulário pela tela de "analisando"
   form.style.display = 'none';
   status.style.display = 'block';
   msg.textContent = 'Enviando...';
@@ -67,8 +92,45 @@ form.addEventListener('submit', async (e) => {
     await salvarLead(dados);
 
     msg.textContent = 'Dados salvos ✓';
-    setTimeout(() => msg.textContent = 'Analisando presença digital...', 900);
-    setTimeout(() => msg.textContent = 'Recebemos! A MAD entrará em contato em breve.', 1800);
+    await new Promise(r => setTimeout(r, 600));
+    msg.textContent = 'Analisando presença digital...';
+    bar.style.width = '30%';
+
+    const resp = await fetch('/api/diagnostico', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payloadDiag)
+    });
+
+    let json = {};
+    try { json = await resp.json(); } catch (e) { json = {}; }
+
+    if (resp.ok && json.id) {
+      bar.style.width = '100%';
+      msg.textContent = 'Diagnóstico pronto! Redirecionando...';
+      setTimeout(() => { window.location.href = 'resultado.html?id=' + encodeURIComponent(json.id); }, 600);
+      return;
+    }
+
+    // erro de limite de uso
+    if (resp.status === 429 && (json.erro === 'limite-excedido' || json.erro === 'ia-rate-limit')) {
+      const texto = json.erro === 'limite-excedido'
+        ? 'Você já fez várias análises hoje. Fale com a MAD para continuar.'
+        : 'A IA está com muitas solicitações agora. Tente novamente em alguns minutos.';
+      msg.textContent = texto;
+      bar.style.width = '0';
+      mostrarBotaoWhats(status);
+      return;
+    }
+
+    // dados inválidos
+    if (resp.status === 400) {
+      msg.textContent = 'Alguns campos precisam ser revisados. Volte e tente novamente.';
+    } else {
+      msg.textContent = 'Ops, não conseguimos gerar seu diagnóstico agora. Fale com a MAD no WhatsApp.';
+    }
+    bar.style.width = '0';
+    mostrarBotaoWhats(status);
 
   } catch (erro) {
     console.error(erro);
@@ -80,6 +142,19 @@ form.addEventListener('submit', async (e) => {
     }, 2500);
   }
 });
+
+function mostrarBotaoWhats(container) {
+  const existente = container.querySelector('.wa-cta');
+  if (existente) return;
+  const a = document.createElement('a');
+  a.href = 'https://wa.me/5512981156417?text=' + encodeURIComponent('Olá! Tentei gerar meu diagnóstico no site da MAD e preciso de ajuda.');
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.className = 'btn btn-primary wa-cta';
+  a.style.marginTop = '12px';
+  a.textContent = 'Falar com a MAD no WhatsApp →';
+  container.appendChild(a);
+}
 
 /* ---------- Faixa de serviços: arrastar com o mouse ---------- */
 const trilho = document.querySelector('.svc-grid');

@@ -107,15 +107,61 @@
       <div class="field"><label for="empresa">Empresa</label><input id="empresa" required placeholder="Nome da empresa"></div>
       <div class="row">
         <div class="field"><label for="whats">WhatsApp</label><input id="whats" type="tel" inputmode="numeric" maxlength="15" autocomplete="tel" required placeholder="(00) 00000-0000" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Use o formato (00) 00000-0000"></div>
-        <div class="field"><label for="insta">Instagram</label><input id="insta" required placeholder="@suaempresa"></div>
+        <div class="field"><label for="cidade">Cidade</label><input id="cidade" placeholder="Sua cidade"></div>
       </div>
       <div class="row">
-        <div class="field"><label for="cidade">Cidade</label><input id="cidade" placeholder="Sua cidade"></div>
         <div class="field"><label for="invest">Investe em marketing?</label>
           <select id="invest"><option value="">Selecione</option><option>Ainda não</option><option>Até R$ 1.000/mês</option><option>R$ 1.000 a R$ 5.000/mês</option><option>Acima de R$ 5.000/mês</option></select></div>
       </div>
       <div class="field"><label for="servico">O que procura?</label>
         <select id="servico"><option value="">Selecione</option><option>Tráfego pago</option><option>Gestão de redes sociais</option><option>Criação de site</option><option>Estratégia completa</option></select></div>
+      <div class="insta-step">
+        <h3>Conte um pouco sobre seu Instagram</h3>
+        <small>Analisamos só o que você nos informar. Não acessamos seu perfil.</small>
+        <div class="field"><label for="igPerfil">@ do perfil</label><input id="igPerfil" required placeholder="@suaempresa"></div>
+        <div class="row">
+          <div class="field"><label for="igSeg">Seguidores</label>
+            <select id="igSeg" required>
+              <option value="">Selecione</option>
+              <option>Até 1.000</option><option>1.000 a 5.000</option><option>5.000 a 10.000</option><option>10.000 a 50.000</option><option>Acima de 50.000</option>
+            </select></div>
+          <div class="field"><label for="igPosts">Posts por semana</label>
+            <select id="igPosts" required>
+              <option value="">Selecione</option>
+              <option>0 (não posta)</option><option>1</option><option>2-3</option><option>4-6</option><option>7 ou mais</option>
+            </select></div>
+        </div>
+        <div class="field"><label for="igBio">Bio do perfil (máx. 300)</label>
+          <textarea id="igBio" required maxlength="300" rows="3" placeholder="Cole aqui a bio do seu Instagram"></textarea>
+        </div>
+        <div class="field"><label>Tipo de conteúdo (marque quantos quiser)</label>
+          <div class="checks">
+            <label><input type="checkbox" name="igConteudo" value="Reels"> Reels</label>
+            <label><input type="checkbox" name="igConteudo" value="Carrosséis"> Carrosséis</label>
+            <label><input type="checkbox" name="igConteudo" value="Stories"> Stories</label>
+            <label><input type="checkbox" name="igConteudo" value="Fotos"> Fotos</label>
+            <label><input type="checkbox" name="igConteudo" value="Lives"> Lives</label>
+            <label><input type="checkbox" name="igConteudo" value="Anúncios"> Anúncios</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="igLink">Tem link na bio?</label>
+            <select id="igLink" required><option value="">Selecione</option><option value="sim">Sim</option><option value="nao">Não</option></select></div>
+          <div class="field"><label for="igObj">Principal objetivo</label>
+            <select id="igObj" required>
+              <option value="">Selecione</option>
+              <option>Ganhar mais clientes</option><option>Aumentar seguidores</option><option>Vender online</option><option>Autoridade no nicho</option><option>Reconhecimento da marca</option>
+            </select></div>
+        </div>
+      </div>
+
+      <div class="field consent">
+        <label for="consent">
+          <input type="checkbox" id="consent" required>
+          Li e concordo com a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.
+        </label>
+      </div>
+
       <button class="btn btn-primary" type="submit">Analisar minha empresa →</button>
       <p class="lgpd">Usaremos seus dados apenas para contato e elaboração do diagnóstico. Leia nossa <a href="privacidade.html" class="footer-link">Política de Privacidade</a>.</p>
     </form>
