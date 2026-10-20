@@ -1,7 +1,6 @@
 /* ============================================================
    MAD — /api/_lib/rateLimit.js
-   Rate limit de análises: máx. N em 24h por contato e por IP.
-   Reutilizável pelo chatbot.
+   Rate limit de análises: máx. N em 24h por WhatsApp e por IP.
    ============================================================ */
 'use strict';
 
@@ -25,14 +24,8 @@ function hashIp(salt, ip) {
 }
 
 // Retorna { ok: true } se dentro do limite, ou { ok: false, motivo } se estourou.
-async function verificarLimite({ email, whatsapp, ipHash }) {
+async function verificarLimite({ whatsapp, ipHash }) {
   const desde = new Date(Date.now() - MS_24H).toISOString();
-  // por e-mail
-  if (email) {
-    const n = await contar('analises_log',
-      'email=eq.' + encodeURIComponent(email) + '&created_at=gte.' + encodeURIComponent(desde));
-    if (n >= LIMITE_24H) return { ok: false, motivo: 'email' };
-  }
   // por WhatsApp
   if (whatsapp) {
     const n = await contar('analises_log',

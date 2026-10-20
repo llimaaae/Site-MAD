@@ -1,6 +1,7 @@
 /* ==========================================================
    MAD — script.js
-========================================================== */
+   Formulário em 2 partes (mesmo cartão), animações e carrossel.
+   ========================================================== */
 
 /* ---------- Configuração do Supabase ---------- */
 const SUPABASE_URL = "https://utbiafditbvpsgpejmli.supabase.co";
@@ -18,92 +19,137 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 document.documentElement.classList.add('js');
 
 
-/* ---------- Envia o lead para o Supabase ---------- */
-async function salvarLead(dados) {
-  const resposta = await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_KEY,
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify(dados)
-  });
-
-  if (!resposta.ok) {
-    const detalhe = await resposta.text();
-    throw new Error('Erro ' + resposta.status + ': ' + detalhe);
-  }
+/* ---------- Envia o lead (Parte 1) para o Supabase ----------
+   O e-mail de aviso para a MAD é disparado pelo webhook do
+   Supabase quando o registro entra na tabela "leads".
+   Se a pessoa voltou para corrigir a Parte 1, o lead é
+   atualizado no lugar (nunca duplicado). */
+async function salvarLead(dados, leadIdAnterior) {
+  return MADFormulario.salvarLead(SUPABASE_URL, SUPABASE_KEY, dados, leadIdAnterior);
 }
 
 
-/* ---------- Formulário ---------- */
+/* ---------- Formulário em 2 partes ---------- */
 const form = document.getElementById('form');
 const status = document.getElementById('status');
 const msg = document.getElementById('msg');
 const bar = document.getElementById('bar');
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+const passo1 = document.getElementById('passo1');
+const passo2 = document.getElementById('passo2');
+const progressoBarra = document.getElementById('progressoBarra');
+const progressoTexto = document.getElementById('progressoTexto');
+const btnParte1 = document.getElementById('btnParte1');
+const btnParte2 = document.getElementById('btnParte2');
+const btnVoltar = document.getElementById('btnVoltar');
+const cartao = document.getElementById('diagnostico');
 
-  // Pega o que a pessoa preencheu (dados de contato)
-  const conteudos = Array.from(document.querySelectorAll('input[name="igConteudo"]:checked')).map(cb => cb.value);
+let leadId = null;      // liga a Parte 1 e a Parte 2
+let passoAtual = 1;
 
+function campo(id) { return document.getElementById(id); }
+
+/* Mostra um dos passos e ajusta a barra de progresso */
+function mostrarPasso(n) {
+  passoAtual = n;
+  passo1.hidden = n !== 1;
+  passo2.hidden = n !== 2;
+
+  progressoBarra.style.width = n === 1 ? '50%' : '100%';
+  progressoTexto.textContent = 'Passo ' + n + ' de 2';
+
+  // o navegador valida só os campos do passo visível
+  passo1.querySelectorAll('[required]').forEach(el => { el.required = n === 1; });
+  passo2.querySelectorAll('[required]').forEach(el => { el.required = n === 2; });
+
+  if (n === 2) {
+    if (cartao && typeof cartao.scrollIntoView === 'function') {
+      cartao.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    const primeiro = campo('igSeg');
+    if (primeiro) primeiro.focus({ preventScroll: true });
+  }
+}
+
+/* ---------- Parte 1: dados da empresa e do contato ---------- */
+async function enviarParte1() {
   const dados = {
-    nome: nome.value.trim(),
-    empresa: empresa.value.trim(),
-    whatsapp: whats.value.trim(),
-    instagram: igPerfil.value.trim(),
-    cidade: cidade.value.trim(),
-    investimento: invest.value,
-    servico: servico.value
+    nome: campo('nome').value.trim(),
+    empresa: campo('empresa').value.trim(),
+    whatsapp: campo('whats').value.trim(),
+    instagram: campo('igPerfil').value.trim(),
+    cidade: campo('cidade').value.trim(),
+    investimento: campo('invest').value,
+    servico: campo('servico').value,
+    consent: campo('consent').checked
   };
 
-  const payloadDiag = {
-    nome: dados.nome,
-    empresa: dados.empresa,
-    whatsapp: dados.whatsapp,
-    instagram: dados.instagram,
-    cidade: dados.cidade,
-    investimento: dados.investimento,
-    servico: dados.servico,
-    seguidores: igSeg.value,
-    posts: igPosts.value,
-    bio: igBio.value.trim(),
-    conteudos: conteudos,
-    linkBio: igLink.value,
-    objetivo: igObj.value,
-    consent: document.getElementById('consent').checked
-  };
+  const check = MADFormulario.validarParte1(dados);
+  if (!check.ok) {
+    if (check.erros.indexOf('consent') !== -1) {
+      alert('Você precisa concordar com a Política de Privacidade para continuar.');
+    }
+    return;   // campos vazios: o navegador mostra o aviso dele
+  }
 
-  // consentimento obrigatório
-  if (!payloadDiag.consent) {
-    alert('Você precisa concordar com a Política de Privacidade para continuar.');
+  // lead_id: um por lead. Se a pessoa voltou para corrigir a Parte 1,
+  // o mesmo lead_id é reaproveitado (o registro é atualizado, não duplicado).
+  if (!leadId) leadId = MADFormulario.gerarLeadId();
+  const payload = MADFormulario.montarPayloadParte1(dados, leadId);
+
+  const rotuloBotao = btnParte1.textContent;
+  btnParte1.disabled = true;
+  btnParte1.textContent = 'Enviando...';
+
+  try {
+    await salvarLead(payload, leadId);
+  } catch (erro) {
+    console.error('erro ao salvar lead:', erro);
+    btnParte1.disabled = false;
+    btnParte1.textContent = rotuloBotao;
+    mostrarAviso('Não conseguimos salvar seus dados agora. Tente novamente em alguns segundos — se persistir, fale com a MAD no WhatsApp.');
+    mostrarBotaoWhats(cartao);
     return;
   }
 
-  // Troca o formulário pela tela de "analisando"
+  btnParte1.disabled = false;
+  btnParte1.textContent = rotuloBotao;
+
+  // Lead salvo: a equipe já recebe o e-mail. Agora vai para a Parte 2.
+  mostrarPasso(2);
+}
+
+/* ---------- Parte 2: dados do Instagram para a avaliação ---------- */
+async function enviarParte2() {
+  const dados = {
+    seguidores: campo('igSeg').value,
+    posts: campo('igPosts').value,
+    conteudos: Array.from(document.querySelectorAll('input[name="igConteudo"]:checked')).map(cb => cb.value),
+    engajamento: campo('igEng').value,
+    frequenciaStories: campo('igFreq').value,
+    linkBio: campo('igLink').value,
+    bio: campo('igBio').value.trim(),
+    objetivo: campo('igObj').value,
+    dificuldade: campo('igDif').value
+  };
+
+  const check = MADFormulario.validarParte2(dados);
+  if (!check.ok) {
+    mostrarAviso('Revise as respostas antes de gerar o diagnóstico.');
+    return;
+  }
+
+  const payload = MADFormulario.montarPayloadParte2(dados, leadId);
+
+  // Tela "Analisando..."
   form.style.display = 'none';
   status.style.display = 'block';
-  msg.textContent = 'Enviando...';
-  setTimeout(() => bar.style.width = '100%', 50);
+  msg.textContent = 'Analisando...';
+  bar.style.width = '30%';
 
   try {
-    await salvarLead(dados);
-
-    msg.textContent = 'Dados salvos ✓';
-    await new Promise(r => setTimeout(r, 600));
-    msg.textContent = 'Analisando presença digital...';
-    bar.style.width = '30%';
-
-    const resp = await fetch('/api/diagnostico', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payloadDiag)
-    });
-
-    let json = {};
-    try { json = await resp.json(); } catch (e) { json = {}; }
+    const resp = await MADFormulario.enviarDiagnostico(payload);
+    const json = resp.json;
 
     if (resp.ok && json.id) {
       bar.style.width = '100%';
@@ -112,23 +158,34 @@ form.addEventListener('submit', async (e) => {
       return;
     }
 
-    // erro de limite de uso
+    // limite de análises
     if (resp.status === 429 && (json.erro === 'limite-excedido' || json.erro === 'ia-rate-limit')) {
-      const texto = json.erro === 'limite-excedido'
+      msg.textContent = json.erro === 'limite-excedido'
         ? 'Você já fez várias análises hoje. Fale com a MAD para continuar.'
         : 'A IA está com muitas solicitações agora. Tente novamente em alguns minutos.';
-      msg.textContent = texto;
       bar.style.width = '0';
       mostrarBotaoWhats(status);
       return;
     }
 
-    // dados inválidos
-    if (resp.status === 400) {
-      msg.textContent = 'Alguns campos precisam ser revisados. Volte e tente novamente.';
-    } else {
-      msg.textContent = 'Ops, não conseguimos gerar seu diagnóstico agora. Fale com a MAD no WhatsApp.';
+    // diagnóstico já gerado para este lead
+    if (resp.status === 409) {
+      msg.textContent = 'Este diagnóstico já foi gerado. Fale com a MAD para receber o link novamente.';
+      bar.style.width = '0';
+      mostrarBotaoWhats(status);
+      return;
     }
+
+    if (resp.status === 400) {
+      msg.textContent = json.erro === 'lead-invalido'
+        ? 'Não encontramos seu cadastro. Volte e preencha o formulário de novo.'
+        : 'Alguns campos precisam ser revisados. Volte e tente novamente.';
+      bar.style.width = '0';
+      mostrarBotaoVoltar(status);
+      return;
+    }
+
+    msg.textContent = 'Ops, não conseguimos gerar seu diagnóstico agora. Fale com a MAD no WhatsApp.';
     bar.style.width = '0';
     mostrarBotaoWhats(status);
 
@@ -141,7 +198,19 @@ form.addEventListener('submit', async (e) => {
       form.style.display = 'block';
     }, 2500);
   }
-});
+}
+
+/* ---------- Avisos dentro do cartão ---------- */
+function mostrarAviso(texto) {
+  let aviso = cartao.querySelector('.aviso-form');
+  if (!aviso) {
+    aviso = document.createElement('p');
+    aviso.className = 'aviso-form';
+    cartao.appendChild(aviso);
+  }
+  aviso.textContent = texto;
+  aviso.hidden = false;
+}
 
 function mostrarBotaoWhats(container) {
   const existente = container.querySelector('.wa-cta');
@@ -155,6 +224,33 @@ function mostrarBotaoWhats(container) {
   a.textContent = 'Falar com a MAD no WhatsApp →';
   container.appendChild(a);
 }
+
+function mostrarBotaoVoltar(container) {
+  const existente = container.querySelector('.voltar-cta');
+  if (existente) return;
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'btn btn-ghost voltar-cta';
+  b.style.marginTop = '12px';
+  b.textContent = '← Voltar e revisar as respostas';
+  b.addEventListener('click', () => {
+    container.style.display = 'none';
+    form.style.display = 'block';
+  });
+  container.appendChild(b);
+}
+
+/* ---------- Envio ---------- */
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const aviso = cartao.querySelector('.aviso-form');
+  if (aviso) aviso.hidden = true;
+
+  if (passoAtual === 1) await enviarParte1();
+  else await enviarParte2();
+});
+
+btnVoltar.addEventListener('click', () => mostrarPasso(1));
 
 /* ---------- Faixa de serviços: arrastar com o mouse ---------- */
 const trilho = document.querySelector('.svc-grid');
@@ -179,6 +275,7 @@ window.addEventListener('mousemove', (e) => {
   e.preventDefault();
   trilho.scrollLeft = scrollInicial - (e.pageX - inicioX);
 });
+
 /* ---------- Máscara do WhatsApp: só números, formato (00) 00000-0000 ---------- */
 const campoWhats = document.getElementById('whats');
 

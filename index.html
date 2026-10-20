@@ -103,22 +103,47 @@
     <form id="form">
       <h2>Diagnóstico gratuito</h2>
       <small>Analisamos sua presença digital e mostramos onde crescer.</small>
-      <div class="field"><label for="nome">Nome</label><input id="nome" required placeholder="Seu nome"></div>
-      <div class="field"><label for="empresa">Empresa</label><input id="empresa" required placeholder="Nome da empresa"></div>
-      <div class="row">
-        <div class="field"><label for="whats">WhatsApp</label><input id="whats" type="tel" inputmode="numeric" maxlength="15" autocomplete="tel" required placeholder="(00) 00000-0000" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Use o formato (00) 00000-0000"></div>
-        <div class="field"><label for="cidade">Cidade</label><input id="cidade" placeholder="Sua cidade"></div>
+
+      <div class="progresso">
+        <div class="progresso-trilha"><i id="progressoBarra"></i></div>
+        <span class="progresso-texto" id="progressoTexto">Passo 1 de 2</span>
       </div>
-      <div class="row">
-        <div class="field"><label for="invest">Investe em marketing?</label>
-          <select id="invest"><option value="">Selecione</option><option>Ainda não</option><option>Até R$ 1.000/mês</option><option>R$ 1.000 a R$ 5.000/mês</option><option>Acima de R$ 5.000/mês</option></select></div>
-      </div>
-      <div class="field"><label for="servico">O que procura?</label>
-        <select id="servico"><option value="">Selecione</option><option>Tráfego pago</option><option>Gestão de redes sociais</option><option>Criação de site</option><option>Estratégia completa</option></select></div>
-      <div class="insta-step">
-        <h3>Conte um pouco sobre seu Instagram</h3>
-        <small>Analisamos só o que você nos informar. Não acessamos seu perfil.</small>
+
+      <!-- PASSO 1 — DADOS DA EMPRESA E DO CONTATO -->
+      <div class="passo" id="passo1">
+        <p class="passo-titulo"><b>Passo 1 de 2</b> <span>— Sobre a sua empresa</span></p>
+
+        <div class="field"><label for="nome">Nome</label><input id="nome" required placeholder="Seu nome"></div>
+        <div class="field"><label for="empresa">Empresa</label><input id="empresa" required placeholder="Nome da empresa"></div>
+        <div class="row">
+          <div class="field"><label for="whats">WhatsApp</label><input id="whats" type="tel" inputmode="numeric" maxlength="15" autocomplete="tel" required placeholder="(00) 00000-0000" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Use o formato (00) 00000-0000"></div>
+          <div class="field"><label for="cidade">Cidade</label><input id="cidade" placeholder="Sua cidade"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="invest">Investe em marketing?</label>
+            <select id="invest"><option value="">Selecione</option><option>Ainda não</option><option>Até R$ 1.000/mês</option><option>R$ 1.000 a R$ 5.000/mês</option><option>Acima de R$ 5.000/mês</option></select></div>
+          <div class="field"><label for="servico">O que procura?</label>
+            <select id="servico"><option value="">Selecione</option><option>Tráfego pago</option><option>Gestão de redes sociais</option><option>Criação de site</option><option>Estratégia completa</option></select></div>
+        </div>
         <div class="field"><label for="igPerfil">@ do perfil</label><input id="igPerfil" required placeholder="@suaempresa"></div>
+
+        <div class="field consent">
+          <label for="consent">
+            <input type="checkbox" id="consent" required>
+            Li e concordo com a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o uso dos meus dados para contato e para a geração do diagnóstico com IA.
+          </label>
+        </div>
+
+        <button class="btn btn-primary" type="submit" id="btnParte1">Continuar →</button>
+        <p class="lgpd">Usaremos seus dados apenas para contato e elaboração do diagnóstico. Leia nossa <a href="privacidade.html" class="footer-link">Política de Privacidade</a>.</p>
+      </div>
+
+      <!-- PASSO 2 — DADOS DO INSTAGRAM PARA A AVALIAÇÃO -->
+      <div class="passo" id="passo2" hidden>
+        <p class="passo-titulo"><b>Passo 2 de 2</b> <span>— Sobre o seu Instagram</span></p>
+        <p class="beneficio">Responda mais algumas perguntas e receba seu diagnóstico gratuito</p>
+        <small>Analisamos só o que você nos informar. Não acessamos seu perfil.</small>
+
         <div class="row">
           <div class="field"><label for="igSeg">Seguidores</label>
             <select id="igSeg" required>
@@ -128,11 +153,20 @@
           <div class="field"><label for="igPosts">Posts por semana</label>
             <select id="igPosts" required>
               <option value="">Selecione</option>
-              <option>0 (não posta)</option><option>1</option><option>2-3</option><option>4-6</option><option>7 ou mais</option>
+              <option>Não posto com regularidade</option><option>1</option><option>2-3</option><option>4-6</option><option>7 ou mais</option>
             </select></div>
         </div>
-        <div class="field"><label for="igBio">Bio do perfil (máx. 300)</label>
-          <textarea id="igBio" required maxlength="300" rows="3" placeholder="Cole aqui a bio do seu Instagram"></textarea>
+        <div class="row">
+          <div class="field"><label for="igEng">Engajamento e retenção</label>
+            <select id="igEng" required>
+              <option value="">Selecione</option>
+              <option>Alto</option><option>Médio</option><option>Baixo</option><option>Não sei</option>
+            </select></div>
+          <div class="field"><label for="igFreq">Stories e reels por semana</label>
+            <select id="igFreq" required>
+              <option value="">Selecione</option>
+              <option>Todos os dias</option><option>3 a 5 vezes por semana</option><option>1 a 2 vezes por semana</option><option>Raramente</option><option>Não sei / varia muito</option>
+            </select></div>
         </div>
         <div class="field"><label>Tipo de conteúdo (marque quantos quiser)</label>
           <div class="checks">
@@ -153,19 +187,28 @@
               <option>Ganhar mais clientes</option><option>Aumentar seguidores</option><option>Vender online</option><option>Autoridade no nicho</option><option>Reconhecimento da marca</option>
             </select></div>
         </div>
-      </div>
+        <div class="field"><label for="igBio">Bio do perfil (máx. 300)</label>
+          <textarea id="igBio" required maxlength="300" rows="3" placeholder="Cole aqui a bio do seu Instagram"></textarea>
+        </div>
+        <div class="field"><label for="igDif">Principal dificuldade hoje</label>
+          <select id="igDif" required>
+            <option value="">Selecione</option>
+            <option>Gerar conteúdo com consistência</option>
+            <option>Ganhar mais clientes</option>
+            <option>Vender mais pelo Instagram</option>
+            <option>Crescer nas buscas (Google)</option>
+            <option>Criar uma identidade visual forte</option>
+            <option>Melhorar anúncios e campanhas</option>
+            <option>Organizar tempo e rotina</option>
+            <option>Não sei / quero explicar na conversa</option>
+          </select>
+        </div>
 
-      <div class="field consent">
-        <label for="consent">
-          <input type="checkbox" id="consent" required>
-          Li e concordo com a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.
-        </label>
+        <button class="btn btn-primary" type="submit" id="btnParte2">Gerar meu diagnóstico →</button>
+        <button class="btn btn-ghost btn-voltar" type="button" id="btnVoltar">← Voltar</button>
       </div>
-
-      <button class="btn btn-primary" type="submit">Analisar minha empresa →</button>
-      <p class="lgpd">Usaremos seus dados apenas para contato e elaboração do diagnóstico. Leia nossa <a href="privacidade.html" class="footer-link">Política de Privacidade</a>.</p>
     </form>
-    <div id="status"><h2 id="msg">Enviando...</h2><div class="loader"><i id="bar"></i></div></div>
+    <div id="status"><h2 id="msg">Analisando...</h2><div class="loader"><i id="bar"></i></div></div>
   </div>
 </div></div>
 
@@ -302,40 +345,6 @@
   </div>
 </section>
 
-<!-- E-BOOK -->
-<section id="ebook">
-  <div class="wrap ebook">
-
-    <!-- Capa do livro -->
-    <div class="ebook-cover reveal">
-      <div class="book">
-        <svg class="book-tri" viewBox="0 0 200 180" aria-hidden="true">
-          <path d="M100 10 190 170H140L100 95 60 170H10Z" fill="url(#ig)"/>
-        </svg>
-        <span class="book-brand">MAD</span>
-        <strong class="book-title">Primeiros passos no marketing digital</strong>
-        <span class="book-sub">Guia prático</span>
-      </div>
-    </div>
-
-    <!-- Texto -->
-    <div class="ebook-info reveal">
-      <p class="ebook-eyebrow">COMECE PEQUENO, PENSE GRANDE</p>
-      <h2>O e-book que <em>abre o caminho.</em></h2>
-      <p class="ebook-text">
-        Um guia prático para entender o cenário da sua empresa no digital
-        e dar os primeiros passos antes de contratar qualquer serviço.
-      </p>
-
-      <div class="ebook-price">R$ 29,99</div>
-      <span class="ebook-badge">R$ 19,99 para quem fecha um plano MAD</span>
-
-      <a href="#diagnostico" class="svc-btn ebook-btn">Quero o e-book →</a>
-    </div>
-
-  </div>
-</section>
-
 <!-- PLANOS -->
 <section id="planos" class="alt"><div class="wrap">
   <div class="title reveal"><p>PLANOS MENSAIS</p><h2>Escolha o nível da sua estratégia.</h2></div>
@@ -375,7 +384,7 @@
 
       <details class="faq-item" name="faq">
         <summary>Como funciona o diagnóstico gratuito?</summary>
-        <p>Você preenche o formulário no início do site e nossa equipe analisa a presença digital da sua empresa. Depois entramos em contato para mostrar onde há oportunidades de crescimento.</p>
+        <p>São duas etapas rápidas no início do site. Primeiro você conta quem é a sua empresa e como quer ser atendido. Depois responde sobre o seu Instagram (seguidores, postagem, engajamento, bio e objetivo). Com essas respostas geramos um diagnóstico na hora, com pontos fortes, pontos a melhorar e ações práticas. Você não precisa criar conta nem senha: o resultado fica em um link que pode ser guardado ou baixado em PDF.</p>
       </details>
 
       <details class="faq-item" name="faq">
@@ -405,6 +414,7 @@
   </div>
 </footer>
 
+<script src="formulario.js"></script>
 <script src="script.js"></script>
 </body>
 

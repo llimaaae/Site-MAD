@@ -12,13 +12,26 @@ fechado). Papel do TI: sites e automações.
   deploy automático a cada push no GitHub (repositório "Site-MAD", branch main).
 - Banco de dados: Supabase (plano grátis), acessado via REST com fetch (sem SDK).
 - Fontes: Montserrat (títulos) e Inter (textos), via Google Fonts.
+- IA: Groq (plano grátis) via `api/diagnostico.js`.
 
 ## Arquivos
 
-- `index.html` / `style.css` / `script.js`: página principal, CSS e animações/formulário.
+- `index.html` / `style.css` / `script.js`: página principal, CSS e animações.
+- `formulario.js`: lógica do formulário em 2 partes (sem DOM, testável em Node).
 - `admin.html` / `admin.js`: painel de leads (login via Supabase Auth).
+- `resultado.html` / `resultado.js`: página de resultado do diagnóstico
+  (`resultado.html?id=...`), sem login, com PDF e link para copiar.
 - `api/notifica-lead.js`: função serverless que envia o e-mail de aviso de lead novo.
+- `api/diagnostico.js`: função serverless que junta a Parte 1 e a Parte 2 do
+  formulário, chama a IA, salva o diagnóstico e envia o e-mail do diagnóstico.
+- `api/resultado.js`: devolve um diagnóstico pelo token público do link.
+- `api/cron/limpeza.js`: rotina diária (Vercel Cron) que apaga diagnósticos
+  vencidos (90 dias) e logs de análise com mais de 24h. Exige `CRON_SECRET`.
+- `api/_lib/`: cors, email (Resend), groq, rateLimit, supabase, validation.
 - `privacidade.html`: política de privacidade (LGPD).
+- `supabase/schema.sql`: colunas e índices novos (aplicar no SQL Editor).
+- `tests/`: testes automatizados (`node --test`), sem dependências externas.
+- `vercel.json`: agendamento do cron de limpeza (1x por dia).
 - `assets/logo.png`: logo oficial da MAD (PNG transparente).
 
 ## Identidade visual
@@ -42,7 +55,8 @@ fechado). Papel do TI: sites e automações.
 ## Segurança (regras do projeto)
 
 - Nunca colocar no código, no GitHub ou no navegador: `service_role`,
-  `sb_secret_...`, senha do banco, chaves de IA, `RESEND_API_KEY`, `WEBHOOK_SECRET`.
+  `sb_secret_...`, senha do banco, chaves de IA, `RESEND_API_KEY`, `WEBHOOK_SECRET`,
+  `CRON_SECRET`.
 - Permitido no front-end: URL do Supabase e chave `sb_publishable_...`.
 - O assistente de IA não deve gerar, mostrar ou repetir segredos nas respostas.
   Usar apenas os NOMES das variáveis de ambiente. Os valores são criados e
@@ -53,6 +67,13 @@ fechado). Papel do TI: sites e automações.
 - Se uma funcionalidade mudar o uso dos dados pessoais, avisar para atualizar a
   política de privacidade (LGPD).
 
+## Variáveis de ambiente (Vercel)
+
+`WEBHOOK_SECRET`, `RESEND_API_KEY`, `LEAD_EMAIL`, `SITE_URL`,
+`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY`, `GROQ_MODEL`,
+`IP_HASH_SALT`, `CRON_SECRET` (novo, protege o cron de limpeza) e `EMAIL_FROM`
+(opcional; sem ele o remetente é `onboarding@resend.dev`).
+
 ## Status
 
 - [x] Passo 1: limpeza de HTML/CSS (sem mudança visual).
@@ -60,18 +81,43 @@ fechado). Papel do TI: sites e automações.
       - Webhook do Supabase envia o segredo no cabeçalho `x-webhook-secret`
         (em HTTP Headers, não em HTTP Parameters).
       - Remetente atual: `onboarding@resend.dev` (provisório até configurar o domínio).
-      - Variáveis na Vercel: `WEBHOOK_SECRET`, `RESEND_API_KEY`, `LEAD_EMAIL`, `SITE_URL`.
-- [ ] Passo 3 (ADIADO de propósito): domínio próprio e configuração na Vercel.
+- [x] Passo 3 (ADIADO de propósito): domínio próprio e configuração na Vercel.
       Não pagar domínio nem planos da Vercel/Supabase até a empresa gerar retorno.
-- [ ] Próximo passo: IA de diagnóstico do Instagram com página de resultado
-      (`resultado.html?id=...`) e botão de WhatsApp.
+- [x] E-book: REMOVIDO do site (seção, CSS e preço).
+- [x] Diagnóstico com IA em 2 partes (mesmo cartão, sem página nova).
+      - Parte 1: dados da empresa/contato. Salva o lead, dispara o e-mail de
+        aviso (webhook do Supabase) e só então mostra a Parte 2.
+      - `lead_id` (uuid gerado no navegador) liga as duas partes; um
+        diagnóstico por lead (índice único em `diagnosticos.lead_id`).
+      - Parte 2: seguidores, posts/semana, tipos de conteúdo, engajamento,
+        stories/reels, link na bio, bio, objetivo e principal dificuldade.
+        "Não sei" = informação ausente (a IA não inventa número).
+      - Resultado em `resultado.html?id=<token aleatório de 32 caracteres>`.
+      - E-mail do diagnóstico (Parte 2 + link) enviado pelo próprio
+        `/api/diagnostico` depois de salvar; se o e-mail falhar, o diagnóstico
+        continua valendo.
+- [x] Rotina de limpeza: cron diário (`api/cron/limpeza.js`) apaga
+      diagnósticos com mais de 90 dias e logs de análise com mais de 24h.
+      A tabela `leads` não é apagada pela rotina.
 
-## Pendências de conteúdo
+## Pendências de conteúdo e operação
 
-- Preencher os campos `[DATA]`, `[SEU E-MAIL]` e `[RAZÃO SOCIAL / CNPJ]` em `privacidade.html`.
-- Escrever a resposta real de "Posso cancelar quando quiser?" no FAQ.
-- Definir as regras do plano anual (à vista ou parcelado, multa, quais planos).
-- Revisar os textos dos serviços para refletir só o que a MAD realmente vende.
-- Definir preços dos planos e o preço real do e-book.
-- Conferir os termos do plano Hobby da Vercel (uso comercial) e avaliar o plano
-  Pro do Supabase para evitar a pausa por inatividade.
+- [ ] Aplicar `supabase/schema.sql` no Supabase SQL Editor **antes** de
+      publicar: sem as colunas `leads.lead_id` e `diagnosticos.*`, o
+      formulário e o diagnóstico não funcionam.
+- [ ] Conferir a URL do projeto Supabase: `utbiafditbvpsgpejmli.supabase.co`
+      não resolveu DNS em 19/10/2026 (projeto pausado, deletado ou URL
+      diferente). Atualizar `script.js` e `admin.js` se mudou.
+- [ ] Cadastrar `CRON_SECRET` na Vercel (sem isso o cron responde 401) e
+      conferir a execução em Settings > Cron Jobs.
+- [ ] Preencher os campos `[DATA]`, `[SEU E-MAIL]` e `[RAZÃO SOCIAL / CNPJ]` em `privacidade.html`.
+- [ ] Escrever a resposta real de "Posso cancelar quando quiser?" no FAQ.
+- [ ] Definir as regras do plano anual (à vista ou parcelado, multa, quais planos).
+- [ ] Revisar os textos dos serviços para refletir só o que a MAD realmente vende.
+- [ ] Definir preços dos planos.
+- [ ] Conferir os termos do plano Hobby da Vercel (uso comercial) e avaliar o
+      plano Pro do Supabase para evitar a pausa por inatividade.
+- [ ] Definir o prazo de retenção dos leads comerciais (a rotina de limpeza
+      não apaga `leads`).
+- [ ] Revisar `oportunidades_para_a_MAD` (agora "próximos passos" genéricos)
+      quando os serviços e planos forem redefinidos.

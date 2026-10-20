@@ -10,14 +10,14 @@
    7. Animação ao rolar
    8. Serviços (carrossel)
    9. Equipe
-   10. E-book
-   11. Logo (imagem)
-   12. Páginas legais
-   13. Dúvidas frequentes
-   14. Triângulo contínuo e divisa curva
-   15. Curvas entre seções
-   16. Faixa do plano anual
-   17. Painel de leads (admin)
+   10. Logo (imagem)
+   11. Páginas legais
+   12. Dúvidas frequentes
+   13. Triângulo contínuo e divisa curva
+   14. Curvas entre seções
+   15. Faixa do plano anual
+   16. Painel de leads (admin)
+   17. Formulário em 2 partes
    18. Responsivo (celular e tablet)
 ========================================================== */
 
@@ -233,7 +233,6 @@ h1 {
 /* Parte destacada dos títulos (azul sólido, sem gradiente) */
 h1 em,
 .title h2 em,
-.ebook-info h2 em,
 .faq-intro h2 em {
     font-style: normal;
     color: var(--blue);
@@ -344,15 +343,6 @@ h1 em,
     resize: vertical;
     transition: 0.2s;
 }
-
-/* bloco de perguntas do Instagram */
-.insta-step {
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px solid var(--line);
-}
-.insta-step h3 { font-size: 16px; margin-bottom: 4px; }
-.insta-step small { display: block; margin-bottom: 14px; color: var(--muted); font-size: 12px; }
 
 /* múltipla escolha */
 .checks { display: flex; flex-wrap: wrap; gap: 10px 16px; }
@@ -742,147 +732,7 @@ footer {
 
 
 /* ==========================================================
-   10. E-BOOK
-========================================================== */
-
-.ebook {
-    display: grid;
-    grid-template-columns: 0.9fr 1.1fr;
-    gap: 70px;
-    align-items: center;
-}
-
-/* ---------- Capa do livro ---------- */
-
-.ebook-cover {
-    display: flex;
-    justify-content: center;
-}
-
-.book {
-    position: relative;
-    width: 260px;
-    height: 340px;
-    padding: 28px 24px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    background: linear-gradient(160deg, #0d1424, #12305a 70%, #009FE3);
-    border: 1px solid rgba(128, 198, 250, 0.25);
-    border-radius: 6px 14px 14px 6px;
-
-    /* Leve inclinação, como um livro apoiado */
-    transform: perspective(900px) rotateY(-14deg);
-    box-shadow: -10px 16px 30px rgba(0, 0, 0, 0.45);
-
-    overflow: hidden;
-}
-
-/* Lombada */
-.book::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 14px;
-
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.35), transparent);
-}
-
-.book-tri {
-    position: absolute;
-    right: -30px;
-    bottom: -20px;
-    width: 190px;
-    opacity: 0.35;
-}
-
-.book-brand {
-    font-family: Montserrat, sans-serif;
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: -1px;
-}
-
-.book-title {
-    position: relative;
-
-    font-family: Montserrat, sans-serif;
-    font-size: 24px;
-    line-height: 1.15;
-}
-
-.book-sub {
-    position: relative;
-
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--light);
-}
-
-/* ---------- Texto ---------- */
-
-.ebook-eyebrow {
-    margin-bottom: 14px;
-
-    font-size: 12px;
-    letter-spacing: 0.35em;
-    color: var(--blue);
-}
-
-.ebook-info h2 {
-    font-size: clamp(30px, 4vw, 46px);
-    font-weight: 900;
-    line-height: 1.1;
-    letter-spacing: -1.5px;
-}
-
-.ebook-text {
-    max-width: 480px;
-    margin-top: 18px;
-
-    font-size: 17px;
-    line-height: 1.6;
-    color: var(--muted);
-}
-
-.ebook-price {
-    margin-top: 28px;
-
-    font-family: Montserrat, sans-serif;
-    font-size: 48px;
-    font-weight: 900;
-    color: var(--blue);
-}
-
-.ebook-badge {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 8px 14px;
-
-    background: rgba(0, 159, 227, 0.12);
-    border: 1px solid rgba(0, 159, 227, 0.3);
-    border-radius: 999px;
-
-    font-size: 13px;
-    color: var(--light);
-}
-
-.ebook-btn {
-    display: inline-block;
-    margin-top: 28px;
-    padding: 16px 34px;
-
-    font-size: 15px;
-}
-
-
-/* ==========================================================
-   11. LOGO (imagem)
+   10. LOGO (imagem)
 ========================================================== */
 
 .logo-link {
@@ -904,7 +754,7 @@ footer {
 
 
 /* ==========================================================
-   12. PÁGINAS LEGAIS (política de privacidade)
+   11. PÁGINAS LEGAIS (política de privacidade)
 ========================================================== */
 
 .legal {
@@ -947,7 +797,7 @@ footer {
 
 
 /* ==========================================================
-   13. DÚVIDAS FREQUENTES
+   12. DÚVIDAS FREQUENTES
 ========================================================== */
 
 .faq {
@@ -1026,7 +876,7 @@ footer {
 
 
 /* ==========================================================
-   14. TRIÂNGULO CONTÍNUO E DIVISA CURVA
+   13. TRIÂNGULO CONTÍNUO E DIVISA CURVA
 ========================================================== */
 
 /* Evita rolagem lateral causada pelo triângulo grande */
@@ -1042,7 +892,7 @@ section .wrap {
 
 
 /* ==========================================================
-   15. CURVAS ENTRE SEÇÕES (alternando convexa e côncava)
+   14. CURVAS ENTRE SEÇÕES (alternando convexa e côncava)
 ========================================================== */
 
 /* Base: o arco existe em todas as seções, mas fica escondido */
@@ -1072,8 +922,7 @@ section::before {
 
 /* ---------- CÔNCAVA: a seção anterior desce em arco para dentro desta ---------- */
 
-#servicos::before,
-#ebook::before {
+#servicos::before {
     display: block;
     top: -1px;
 
@@ -1083,7 +932,7 @@ section::before {
 
 
 /* ==========================================================
-   16. FAIXA DO PLANO ANUAL
+   15. FAIXA DO PLANO ANUAL
 ========================================================== */
 
 .annual {
@@ -1124,7 +973,7 @@ section::before {
 
 
 /* ==========================================================
-   17. PAINEL DE LEADS (admin)
+   16. PAINEL DE LEADS (admin)
 ========================================================== */
 
 .admin {
@@ -1245,6 +1094,96 @@ section::before {
 
 
 /* ==========================================================
+   17. FORMULÁRIO EM 2 PARTES
+   ========================================================== */
+
+
+/* Barra de progresso */
+.progresso {
+    margin: 14px 0 18px;
+}
+
+.progresso-trilha {
+    height: 4px;
+
+    background: var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progresso-trilha i {
+    display: block;
+    width: 50%;
+    height: 100%;
+
+    background: var(--blue);
+    transition: width 0.4s ease;
+}
+
+.progresso-texto {
+    display: block;
+    margin-top: 8px;
+
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--light);
+}
+
+/* Cada passo do formulário */
+.passo {
+    animation: passoIn 0.35s ease;
+}
+
+@keyframes passoIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.passo-titulo {
+    margin-bottom: 16px;
+
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.passo-titulo b {
+    color: var(--white);
+    font-weight: 700;
+}
+
+/* Texto de benefício do passo 2 */
+.beneficio {
+    margin-bottom: 8px;
+
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--light);
+}
+
+/* Aviso dentro do cartão */
+.aviso-form {
+    margin-top: 12px;
+    padding: 10px 14px;
+
+    background: rgba(255, 193, 7, 0.08);
+    border: 1px solid rgba(255, 193, 7, 0.25);
+    border-radius: 8px;
+
+    font-size: 13px;
+    color: #ffe082;
+}
+
+/* Botão de voltar (não ocupa a largura toda) */
+.card .btn-voltar {
+    width: auto;
+    margin-top: 10px;
+    padding: 10px 18px;
+
+    font-size: 13px;
+}
+
+
+/* ==========================================================
    18. RESPONSIVO (celular e tablet)
 ========================================================== */
 
@@ -1277,17 +1216,6 @@ section::before {
         right: -90px;
         bottom: -120px;
         width: 420px;
-    }
-
-    .ebook {
-        grid-template-columns: 1fr;
-        gap: 40px;
-        text-align: center;
-    }
-
-    .ebook-text {
-        margin-left: auto;
-        margin-right: auto;
     }
 
     .faq {

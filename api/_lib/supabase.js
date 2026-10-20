@@ -56,6 +56,25 @@ async function contar(tabela, filtroQuery) {
   return Array.isArray(dados) ? dados.length : 0;
 }
 
+/* Remove as linhas que batem com o filtro (PostgREST DELETE).
+   Usado só pela rotina de limpeza (diagnósticos vencidos e log antigo).
+   filterExample: "expira_em=lt.2026-01-01T00:00:00Z" */
+async function remover(tabela, filtroQuery) {
+  const r = await fetch(SUPABASE_URL + '/rest/v1/' + tabela + '?' + filtroQuery, {
+    method: 'DELETE',
+    headers: headersBase({ 'Prefer': 'return=representation' })
+  });
+  if (!r.ok) {
+    const detalhe = await r.text();
+    const err = new Error('supabase-delete-falhou');
+    err.status = r.status;
+    err.detail = detalhe;
+    throw err;
+  }
+  const dados = await r.json().catch(() => []);
+  return Array.isArray(dados) ? dados.length : 0;
+}
+
 async function buscarUm(tabela, filtroQuery) {
   const r = await fetch(SUPABASE_URL + '/rest/v1/' + tabela + '?select=*&' + filtroQuery + '&limit=1', {
     method: 'GET',
@@ -72,4 +91,4 @@ async function buscarUm(tabela, filtroQuery) {
   return Array.isArray(dados) && dados.length ? dados[0] : null;
 }
 
-module.exports = { inserir, contar, buscarUm, SUPABASE_URL };
+module.exports = { inserir, contar, buscarUm, remover, SUPABASE_URL };
