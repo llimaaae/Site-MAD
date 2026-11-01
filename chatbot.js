@@ -591,20 +591,6 @@ function criarChatWidget() {
     sendBtn.disabled = state.isLoading;
   });
   
-  // Carrega histórico inicial
-  const historico = carregarHistorico();
-  if (historico.length > 0) {
-    // Restaura mensagens (sem reenviar)
-    historico.forEach(msg => {
-      chat.sendMessage = (() => {
-        const original = chat.sendMessage;
-        return (content) => {
-          // Mock temporário para restaurar sem API call
-        };
-      })();
-    });
-  }
-  
   function enviar() {
     const mensagem = input.value.trim();
     if (!mensagem) return;
