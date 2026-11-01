@@ -56,21 +56,15 @@ function useChat(config) {
       
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        
+
+        // Resposta em texto puro: cada chunk é recebe o texto direto
         const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-        
-        for (const line of lines) {
-          if (line.startsWith('0:')) {
-            const text = line.slice(2).replace(/^"(.*)"$/, '$1');
-            assistantMessage.content += text;
-            notify();
-          }
-        }
+        assistantMessage.content += chunk;
+        notify();
       }
       
     } catch (e) {

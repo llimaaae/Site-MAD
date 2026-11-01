@@ -117,34 +117,45 @@ export default async (req, res) => {
     const result = streamText({
       model: anthropic(modelo, { apiKey }),
       system: SYSTEM_PROMPT,
-      messages,
+      messages: messages.map(m => ({ role: m.role, content: m.content })),
       maxTokens: 1024,
       temperature: 0.7,
     });
-    
-    // Retorna stream direto (Vercel AI SDK cuida do formato)
-    result.pipeDataStreamToResponse(res);
-    
+
+    // Streaming em texto puro (API estável do SDK, sem protocolo proprietário)
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.status(200);
+
+    for await (const chunk of result.textStream) {
+      res.write(chunk);
+    }
+    res.end();
+
   } catch (erro) {
-    console.error('Erro ao chamar Anthropic:', erro);
-    
-    if (erro.message?.includes('rate limit') || erro.status === 429) {
-      return res.status(429).json({ 
-        erro: 'ia-rate-limit',
-        mensagem: 'A IA está com muitas solicitações agora. Tente novamente em alguns minutos.' 
+    console.error('Erro ao chamar Anthropic:', erro?.message || String(erro));
+
+    // Erro antes de enviar cabeçalhos: responde JSON com status correto
+    if (!res.headersSent) {
+      if (erro?.status === 429 || /rate.?limit/i.test(erro?.message || '')) {
+        return res.status(429).json({
+          erro: 'ia-rate-limit',
+          mensagem: 'A IA está com muitas solicitações agora. Tente novamente em alguns minutos.'
+        });
+      }
+      if (erro?.status === 401 || erro?.status === 403) {
+        return res.status(503).json({
+          erro: 'chat-indisponivel',
+          mensagem: 'Chat indisponível no momento. Fale com a MAD pelo WhatsApp (12) 98115-6417.'
+        });
+      }
+      return res.status(500).json({
+        erro: 'erro-interno',
+        mensagem: 'Erro ao processar sua mensagem. Tente novamente.'
       });
     }
-    
-    if (erro.status === 401 || erro.message?.includes('authentication')) {
-      return res.status(503).json({ 
-        erro: 'chat-indisponivel',
-        mensagem: 'Erro na configuração do chat. Entre em contato conosco.' 
-      });
-    }
-    
-    return res.status(500).json({ 
-      erro: 'erro-interno',
-      mensagem: 'Erro ao processar sua mensagem. Tente novamente.' 
-    });
+
+    // Erro no meio do stream: encerra normalmente
+    res.end();
   }
 };
