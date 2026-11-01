@@ -3,10 +3,10 @@
    Rota de chat com streaming via Vercel AI SDK + Anthropic.
    ========================================================== */
 
-const { streamText } = require('ai');
-const { anthropic } = require('@ai-sdk/anthropic');
-const { aplicarCors } = require('./_lib/cors');
-const { SYSTEM_PROMPT } = require('../lib/chatbot/system-prompt');
+import { streamText } from 'ai';
+import { anthropic } from '@ai-sdk/anthropic';
+import { aplicarCors } from './_lib/cors.js';
+import { SYSTEM_PROMPT } from '../lib/chatbot/system-prompt.js';
 
 // Rate limit simples em memória (Map com TTL)
 const rateLimitMap = new Map();
@@ -45,7 +45,7 @@ function obterIp(req) {
          'unknown';
 }
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   aplicarCors(req, res);
   
   if (req.method === 'OPTIONS') return res.status(200).end();

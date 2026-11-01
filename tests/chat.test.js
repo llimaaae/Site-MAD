@@ -46,7 +46,8 @@ test('POST /api/chat exige array messages', async () => {
   delete require.cache[require.resolve('../api/chat')];
   process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
   
-  const handler = require('../api/chat');
+  const module = await import('../api/chat.js');
+  const handler = module.default;
   const req = criarReq('POST', '/api/chat', {});
   const res = criarRes();
   
@@ -60,7 +61,8 @@ test('POST /api/chat rejeita messages vazio', async () => {
   delete require.cache[require.resolve('../api/chat')];
   process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
   
-  const handler = require('../api/chat');
+  const module = await import('../api/chat.js');
+  const handler = module.default;
   const req = criarReq('POST', '/api/chat', { messages: [] });
   const res = criarRes();
   
@@ -74,7 +76,8 @@ test('POST /api/chat rejeita mensagem sem role', async () => {
   delete require.cache[require.resolve('../api/chat')];
   process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
   
-  const handler = require('../api/chat');
+  const module = await import('../api/chat.js');
+  const handler = module.default;
   const req = criarReq('POST', '/api/chat', { 
     messages: [{ content: 'teste' }] 
   });
@@ -90,7 +93,8 @@ test('POST /api/chat rejeita mensagem sem content', async () => {
   delete require.cache[require.resolve('../api/chat')];
   process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
   
-  const handler = require('../api/chat');
+  const module = await import('../api/chat.js');
+  const handler = module.default;
   const req = criarReq('POST', '/api/chat', { 
     messages: [{ role: 'user' }] 
   });
@@ -106,7 +110,8 @@ test('POST /api/chat rejeita mensagem muito longa (>10k chars)', async () => {
   delete require.cache[require.resolve('../api/chat')];
   process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
   
-  const handler = require('../api/chat');
+  const module = await import('../api/chat.js');
+  const handler = module.default;
   const req = criarReq('POST', '/api/chat', { 
     messages: [{ role: 'user', content: 'a'.repeat(10001) }] 
   });
@@ -122,7 +127,8 @@ test('POST /api/chat rejeita histórico com mais de 50 mensagens', async () => {
   delete require.cache[require.resolve('../api/chat')];
   process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
   
-  const handler = require('../api/chat');
+  const module = await import('../api/chat.js');
+  const handler = module.default;
   const messages = Array(51).fill(null).map(() => ({ 
     role: 'user', 
     content: 'teste' 
@@ -141,7 +147,8 @@ test('POST /api/chat responde 503 se ANTHROPIC_API_KEY ausente', async () => {
   delete process.env.ANTHROPIC_API_KEY;
   delete require.cache[require.resolve('../api/chat')];
   
-  const handler = require('../api/chat');
+  const module = await import('../api/chat.js?t=' + Date.now());
+  const handler = module.default;
   const req = criarReq('POST', '/api/chat', { 
     messages: [{ role: 'user', content: 'Olá' }] 
   });
@@ -160,7 +167,8 @@ test('POST /api/chat responde 503 se ANTHROPIC_API_KEY ausente', async () => {
 test('POST /api/chat retorna 405 para GET', async () => {
   delete require.cache[require.resolve('../api/chat')];
   
-  const handler = require('../api/chat');
+  const module = await import('../api/chat.js');
+  const handler = module.default;
   const req = criarReq('GET', '/api/chat');
   const res = criarRes();
   
@@ -173,7 +181,8 @@ test('POST /api/chat retorna 405 para GET', async () => {
 test('OPTIONS /api/chat retorna 200', async () => {
   delete require.cache[require.resolve('../api/chat')];
   
-  const handler = require('../api/chat');
+  const module = await import('../api/chat.js');
+  const handler = module.default;
   const req = criarReq('OPTIONS', '/api/chat');
   const res = criarRes();
   

@@ -30,4 +30,4 @@ function aplicarCors(req, res) {
   return false;
 }
 
-module.exports = { aplicarCors };
+export { aplicarCors };
