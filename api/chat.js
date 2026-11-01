@@ -1,7 +1,8 @@
 /* ==========================================================
    MAD — api/chat.js
-   Chat com IA: chamada direta à API da Anthropic (sem SDK),
-   com streaming de texto puro, CORS, rate limit e validação.
+   Chat com IA Grátis: chamada direta à API da Groq (modelo
+   openai/gpt-oss), com streaming de texto puro, CORS, rate
+   limit e validação. Mesmo padrão do api/_lib/groq.js (diagnóstico).
    ========================================================== */
 
 import { aplicarCors } from './_lib/cors.js';
@@ -12,8 +13,11 @@ const rateLimitMap = new Map();
 const LIMITE_POR_IP = 20; // mensagens por janela
 const JANELA_MS = 3600000; // 1 hora
 
-const MODELO_PADRAO = process.env.CHAT_MODEL || 'claude-sonnet-4-5';
-const API_ANTHROPIC = 'https://api.anthropic.com/v1/messages';
+// Modelos Groq (grátis no plano free):
+//   openai/gpt-oss-120b  -> padrão, melhor qualidade
+//   openai/gpt-oss-20b   -> mais rápido e leve
+const MODELO_PADRAO = process.env.CHAT_MODEL || 'openai/gpt-oss-120b';
+const API_GROQ = 'https://api.groq.com/openai/v1/chat/completions';
 
 function limparExpirados() {
   const agora = Date.now();
@@ -56,7 +60,7 @@ export default async (req, res) => {
   }
 
   // Chave ausente = resposta educada (não quebra o site)
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     return res.status(503).json({
       erro: 'chat-indisponivel',
@@ -120,27 +124,28 @@ export default async (req, res) => {
   const modelo = MODELO_PADRAO;
 
   try {
-    const resposta = await fetch(API_ANTHROPIC, {
+    const resposta = await fetch(API_GROQ, {
       method: 'POST',
       headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json'
+        'Authorization': 'Bearer ' + apiKey,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         model: modelo,
-        system: SYSTEM_PROMPT,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...messages.map(m => ({ role: m.role, content: m.content }))
+        ],
         max_tokens: 1024,
         temperature: 0.7,
-        stream: true,
-        messages: messages.map(m => ({ role: m.role, content: m.content }))
+        stream: true
       })
     });
 
-    // Erro da Anthropic antes do streaming: devolve status amigável
+    // Erro da Groq antes do streaming: devolve status amigável
     if (!resposta.ok || !resposta.body) {
       const detalhe = await resposta.text().catch(() => '');
-      console.error('Anthropic respondeu', resposta.status, detalhe.slice(0, 500));
+      console.error('Groq respondeu', resposta.status, detalhe.slice(0, 500));
 
       if (resposta.status === 429) {
         return res.status(429).json({
@@ -154,8 +159,8 @@ export default async (req, res) => {
           mensagem: 'Chat indisponível no momento. Fale com a MAD pelo WhatsApp (12) 98115-6417.'
         });
       }
-      if (resposta.status === 404) {
-        console.error('Modelo configurado não existe:', modelo);
+      if (resposta.status === 404 || resposta.status === 400) {
+        console.error('Modelo configurado não existe ou requisição inválida:', modelo);
         return res.status(503).json({
           erro: 'chat-indisponivel',
           mensagem: 'Chat em manutenção. Fale com a MAD pelo WhatsApp.'
@@ -167,7 +172,7 @@ export default async (req, res) => {
       });
     }
 
-    // Streaming: lê o SSE da Anthropic e encaminha só o texto gerado
+    // Streaming: lê o SSE da Groq e encaminha só o texto gerado
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache, no-transform');
     res.status(200);
@@ -187,7 +192,7 @@ export default async (req, res) => {
       for (const linha of linhas) {
         if (!linha.startsWith('data:')) continue;
         const dado = linha.slice(5).trim();
-        if (!dado) continue;
+        if (!dado || dado === '[DONE]') continue;
 
         let evento;
         try {
@@ -196,14 +201,14 @@ export default async (req, res) => {
           continue;
         }
 
-        if (evento.type === 'content_block_delta' &&
-            evento.delta &&
-            evento.delta.type === 'text_delta' &&
-            typeof evento.delta.text === 'string') {
-          res.write(evento.delta.text);
-        } else if (evento.type === 'error') {
-          console.error('Anthropic errou no stream:',
-            JSON.stringify(evento.error || evento).slice(0, 300));
+        const texto = evento.choices && evento.choices[0] &&
+          evento.choices[0].delta && evento.choices[0].delta.content;
+
+        if (typeof texto === 'string' && texto.length > 0) {
+          res.write(texto);
+        } else if (evento.error) {
+          console.error('Groq errou no stream:',
+            JSON.stringify(evento.error).slice(0, 300));
           res.end();
           return;
         }
@@ -213,7 +218,7 @@ export default async (req, res) => {
     res.end();
 
   } catch (erro) {
-    console.error('Erro ao chamar Anthropic:', erro?.message || String(erro));
+    console.error('Erro ao chamar Groq:', erro?.message || String(erro));
 
     // Erro antes de enviar cabeçalhos: responde JSON com status correto
     if (!res.headersSent) {

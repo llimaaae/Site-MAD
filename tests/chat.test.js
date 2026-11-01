@@ -44,7 +44,7 @@ function criarReq(metodo, url, body = null) {
 test('POST /api/chat exige array messages', async () => {
   // Limpa cache do require para forçar recarga
   delete require.cache[require.resolve('../api/chat')];
-  process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
+  process.env.GROQ_API_KEY = 'gsk-test-mock';
   
   const module = await import('../api/chat.js');
   const handler = module.default;
@@ -59,7 +59,7 @@ test('POST /api/chat exige array messages', async () => {
 
 test('POST /api/chat rejeita messages vazio', async () => {
   delete require.cache[require.resolve('../api/chat')];
-  process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
+  process.env.GROQ_API_KEY = 'gsk-test-mock';
   
   const module = await import('../api/chat.js');
   const handler = module.default;
@@ -74,7 +74,7 @@ test('POST /api/chat rejeita messages vazio', async () => {
 
 test('POST /api/chat rejeita mensagem sem role', async () => {
   delete require.cache[require.resolve('../api/chat')];
-  process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
+  process.env.GROQ_API_KEY = 'gsk-test-mock';
   
   const module = await import('../api/chat.js');
   const handler = module.default;
@@ -91,7 +91,7 @@ test('POST /api/chat rejeita mensagem sem role', async () => {
 
 test('POST /api/chat rejeita mensagem sem content', async () => {
   delete require.cache[require.resolve('../api/chat')];
-  process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
+  process.env.GROQ_API_KEY = 'gsk-test-mock';
   
   const module = await import('../api/chat.js');
   const handler = module.default;
@@ -108,7 +108,7 @@ test('POST /api/chat rejeita mensagem sem content', async () => {
 
 test('POST /api/chat rejeita mensagem muito longa (>10k chars)', async () => {
   delete require.cache[require.resolve('../api/chat')];
-  process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
+  process.env.GROQ_API_KEY = 'gsk-test-mock';
   
   const module = await import('../api/chat.js');
   const handler = module.default;
@@ -125,7 +125,7 @@ test('POST /api/chat rejeita mensagem muito longa (>10k chars)', async () => {
 
 test('POST /api/chat rejeita histórico com mais de 50 mensagens', async () => {
   delete require.cache[require.resolve('../api/chat')];
-  process.env.ANTHROPIC_API_KEY = 'sk-test-mock';
+  process.env.GROQ_API_KEY = 'gsk-test-mock';
   
   const module = await import('../api/chat.js');
   const handler = module.default;
@@ -142,9 +142,9 @@ test('POST /api/chat rejeita histórico com mais de 50 mensagens', async () => {
   assert.strictEqual(res.corpo.erro, 'historico-muito-longo');
 });
 
-test('POST /api/chat responde 503 se ANTHROPIC_API_KEY ausente', async () => {
-  const originalKey = process.env.ANTHROPIC_API_KEY;
-  delete process.env.ANTHROPIC_API_KEY;
+test('POST /api/chat responde 503 se GROQ_API_KEY ausente', async () => {
+  const originalKey = process.env.GROQ_API_KEY;
+  delete process.env.GROQ_API_KEY;
   delete require.cache[require.resolve('../api/chat')];
   
   const module = await import('../api/chat.js?t=' + Date.now());
@@ -161,7 +161,7 @@ test('POST /api/chat responde 503 se ANTHROPIC_API_KEY ausente', async () => {
   assert.match(res.corpo.mensagem, /temporariamente indisponível/i);
   
   // Restaura
-  if (originalKey) process.env.ANTHROPIC_API_KEY = originalKey;
+  if (originalKey) process.env.GROQ_API_KEY = originalKey;
 });
 
 test('POST /api/chat retorna 405 para GET', async () => {
