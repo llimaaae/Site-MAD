@@ -1,0 +1,17 @@
+{
+  "name": "site-mad",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MAD - Marketing digital com chatbot IA",
+  "scripts": {
+    "test": "node --test tests/**/*.test.js"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.94",
+    "ai": "^7.0.159",
+    "zod": "^4.6.7"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
