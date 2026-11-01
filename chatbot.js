@@ -94,6 +94,105 @@ function useChat(config) {
   return { subscribe, sendMessage, reload, clearMessages };
 }
 
+// ==================== Markdown seguro ====================
+// Todo texto passa por escaparHtml() ANTES de virar HTML: '<', '>',
+// '&' e aspas viram entidades. Assim resposta da IA vira texto,
+// nunca código executável (anti-XSS). As tags (bold, listas, links,
+// títulos) são geradas aqui, controladas por nós.
+
+function escaparHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function inlinizar(s) {
+  return s
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+}
+
+function renderizarMarkdown(texto) {
+  const linhas = String(texto === null || texto === undefined ? '' : texto).split('\n');
+  const partes = [];
+  const pilha = []; // listas abertas
+  let paragrafo = [];
+
+  function flushParagrafo() {
+    if (paragrafo.length === 0) return;
+    partes.push('<p>' + paragrafo.map(inlinizar).join('<br>') + '</p>');
+    paragrafo = [];
+  }
+
+  function fecharListas(ateNivel) {
+    while (pilha.length > ateNivel) {
+      const tipo = pilha.pop().tipo;
+      partes.push('</' + tipo + '>');
+    }
+  }
+
+  for (const linhaBruta of linhas) {
+    const t = linhaBruta.trim();
+
+    // Linha em branco: fecha parágrafo e listas
+    if (t === '') {
+      flushParagrafo();
+      fecharListas(0);
+      continue;
+    }
+
+    // Título markdown (# até ######)
+    const mTitulo = t.match(/^(#{1,6})\s+(.+)$/);
+    if (mTitulo) {
+      flushParagrafo();
+      fecharListas(0);
+      const tag = mTitulo[1].length >= 3 ? 'h5' : 'h4';
+      partes.push('<' + tag + '>' + inlinizar(escaparHtml(mTitulo[2])) + '</' + tag + '>');
+      continue;
+    }
+
+    // Divisória (---) vira <hr>
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(t)) {
+      flushParagrafo();
+      fecharListas(0);
+      partes.push('<hr>');
+      continue;
+    }
+
+    // Item de lista (suporta até 3 níveis por recuo de 2 espaços)
+    const mItem = linhaBruta.match(/^(\s*)([-*•]|\d+[.)])\s+(.+)$/);
+    if (mItem) {
+      flushParagrafo();
+      const nivel = Math.min(
+        Math.floor(mItem[1].replace(/\t/g, '  ').length / 2), 3);
+      const tipo = /^\d/.test(mItem[2]) ? 'ol' : 'ul';
+      const ok = pilha.length === nivel + 1 &&
+        pilha[nivel] && pilha[nivel].tipo === tipo;
+      if (!ok) {
+        if (pilha.length > nivel) fecharListas(nivel);
+        while (pilha.length < nivel + 1) {
+          partes.push('<' + tipo + '>');
+          pilha.push({ tipo: tipo });
+        }
+      }
+      partes.push('<li>' + inlinizar(escaparHtml(mItem[3])) + '</li>');
+      continue;
+    }
+
+    // Linha de parágrafo (quebra simples vira <br>)
+    paragrafo.push(escaparHtml(t));
+  }
+
+  flushParagrafo();
+  fecharListas(0);
+  return partes.join('');
+}
+
 // ==================== Componente do Chat ====================
 function criarChatWidget() {
   const chat = useChat({ api: '/api/chat' });
@@ -187,6 +286,7 @@ function criarChatWidget() {
     .mad-chat-messages {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 20px;
       display: flex;
       flex-direction: column;
@@ -226,6 +326,7 @@ function criarChatWidget() {
       font-size: 14px;
       line-height: 1.5;
       word-wrap: break-word;
+      overflow-wrap: anywhere;
     }
     .mad-chat-message.user .mad-chat-bubble {
       background: var(--blue, #009FE3);
@@ -256,6 +357,33 @@ function criarChatWidget() {
     .mad-chat-bubble a {
       color: var(--light, #80C6FA);
       text-decoration: underline;
+    }
+    .mad-chat-bubble ul,
+    .mad-chat-bubble ol {
+      margin: 8px 0;
+      padding-left: 18px;
+    }
+    .mad-chat-bubble li {
+      margin: 4px 0;
+    }
+    .mad-chat-bubble h4,
+    .mad-chat-bubble h5 {
+      margin: 12px 0 4px 0;
+      font-family: Montserrat, Arial, sans-serif;
+      color: var(--light, #80C6FA);
+      font-size: 14px;
+    }
+    .mad-chat-bubble hr {
+      border: none;
+      border-top: 1px solid var(--line, #1b2740);
+      margin: 10px 0;
+    }
+    .mad-chat-bubble code {
+      background: var(--navy, #090D18);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
     }
     .mad-chat-typing {
       display: flex;
@@ -517,21 +645,9 @@ function criarChatWidget() {
         
         const bubble = document.createElement('div');
         bubble.className = 'mad-chat-bubble';
-        
-        // Renderiza markdown básico (negrito, listas, links)
-        let html = msg.content
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\n\n/g, '</p><p>')
-          .replace(/\n- /g, '<li>')
-          .replace(/\n\d+\. /g, '<li>')
-          .replace(/<li>/g, '</p><ul><li>')
-          .replace(/<\/li>(?!<li>)/g, '</li></ul><p>');
-        
-        if (!html.startsWith('<p>')) html = '<p>' + html;
-        if (!html.endsWith('</p>')) html += '</p>';
-        html = html.replace(/<p><\/p>/g, '');
-        
-        bubble.innerHTML = html;
+
+        // Markdown seguro: todo texto é escapado antes (anti-XSS)
+        bubble.innerHTML = renderizarMarkdown(msg.content);
         
         div.appendChild(avatar);
         div.appendChild(bubble);
@@ -628,11 +744,18 @@ function criarChatWidget() {
   });
 }
 
+// Exposição p/ teste em Node (o widget em si só roda no navegador)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { renderizarMarkdown };
+}
+
 // Inicialização quando DOM carregar
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', criarChatWidget);
-} else {
-  criarChatWidget();
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', criarChatWidget);
+  } else {
+    criarChatWidget();
+  }
 }
 
 })();
