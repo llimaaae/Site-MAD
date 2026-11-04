@@ -51,6 +51,24 @@ function coletarDados() {
   };
 }
 
+/* ---------- Mostra mensagem de status com acessibilidade ---------- */
+function mostrarStatus(tipo, html) {
+  status.hidden = false;
+  status.className = 'status-' + tipo; // success, error, loading
+  status.setAttribute('role', tipo === 'error' ? 'alert' : 'status');
+  status.setAttribute('aria-live', tipo === 'error' ? 'assertive' : 'polite');
+  msg.innerHTML = html;
+  // scroll suave até a mensagem
+  status.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ---------- Esconde mensagem de status ---------- */
+function esconderStatus() {
+  status.hidden = true;
+  status.className = '';
+  msg.innerHTML = '';
+}
+
 /* ---------- Envio do formulário ---------- */
 async function enviar() {
   if (enviando) return;
@@ -59,6 +77,7 @@ async function enviar() {
   // limpa avisos anteriores
   const avisoExistente = cartao.querySelector('.aviso-form');
   if (avisoExistente) avisoExistente.hidden = true;
+  esconderStatus();
 
   const dados = coletarDados();
   const check = MADFormulario.validar(dados);
@@ -73,9 +92,15 @@ async function enviar() {
 
     // consent não marcado
     if (check.erros.includes('consent')) {
-      mostrarAviso('Você precisa autorizar o contato para enviar.');
+      mostrarStatus('error', '<p>Você precisa autorizar o contato para enviar.</p>');
+      campo('consent').focus();
+    } else {
+      // mostra qual campo precisa ser corrigido
+      const primeiroErro = check.erros[0];
+      const campoErro = campo(primeiroErro);
+      if (campoErro) campoErro.focus();
+      mostrarStatus('error', '<p>Por favor, preencha corretamente os campos indicados.</p>');
     }
-    // outros erros: o navegador mostra validação nativa (required, pattern, type="email")
     enviando = false;
     return;
   }
@@ -85,6 +110,7 @@ async function enviar() {
   const rotuloOriginal = btnEnviar.textContent;
   btnEnviar.disabled = true;
   btnEnviar.textContent = 'Enviando...';
+  mostrarStatus('loading', '<p class="loading-text">Enviando seus dados...</p>');
 
   try {
     await salvarLead(payload);
@@ -92,8 +118,14 @@ async function enviar() {
     console.error('erro ao salvar lead:', erro);
     btnEnviar.disabled = false;
     btnEnviar.textContent = rotuloOriginal;
-    mostrarAviso('Não conseguimos salvar seus dados agora. Tente novamente em alguns segundos — se persistir, fale com a MAD no WhatsApp.');
-    mostrarBotaoWhats(cartao);
+    mostrarStatus('error', `
+      <p>Não conseguimos salvar seus dados agora.</p>
+      <p class="error-hint">Tente novamente em alguns segundos. Se persistir, fale com a MAD no WhatsApp.</p>
+      <a href="https://wa.me/5512981156417?text=${encodeURIComponent('Olá! Preenchi o formulário no site da MAD e gostaria de falar com a equipe.')}" 
+         target="_blank" rel="noopener noreferrer" class="btn btn-primary wa-cta" style="margin-top: 12px; display: inline-block;">
+        Falar com a MAD no WhatsApp →
+      </a>
+    `);
     enviando = false;
     return;
   }
@@ -109,26 +141,22 @@ async function enviar() {
 /* ---------- Tela de sucesso ---------- */
 function sucesso() {
   form.style.display = 'none';
-  status.hidden = false;
-  status.classList.add('success');
-  msg.innerHTML = `
+  mostrarStatus('success', `
     <h2>Enviado com sucesso!</h2>
-    <p>Nossa equipe vai analisar seu perfil e entrar em contato pelo WhatsApp ou e-mail.</p>
+    <p>Recebemos seus dados! Em breve nossa equipe entra em contato pelo WhatsApp.</p>
     <div class="success-actions">
       <a href="https://wa.me/5512981156417?text=${encodeURIComponent('Olá! Preenchi o formulário no site da MAD e gostaria de falar com a equipe.')}" 
          target="_blank" rel="noopener noreferrer" class="btn btn-primary">Falar no WhatsApp →</a>
       <button class="btn btn-ghost" onclick="resetarFormulario()">Enviar outro</button>
     </div>
-  `;
+  `);
 }
 
 /* ---------- Reset do formulário ---------- */
 function resetarFormulario() {
   form.reset();
   form.style.display = 'block';
-  status.hidden = true;
-  status.classList.remove('success');
-  msg.innerHTML = '';
+  esconderStatus();
 }
 
 /* ---------- Avisos e botão WhatsApp ---------- */

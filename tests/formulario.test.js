@@ -21,7 +21,7 @@ const DADOS_VALIDOS = {
   instagram: '@clinicaaurora',
   email: 'ana@clinica.com',
   investe_marketing: 'Invisto todo mês',
-  interesses: ['Site', 'Gestão de Instagram'],
+  interesses: ['Reels', 'Carrosséis'],
   consent: true,
   website: '' // honeypot vazio
 };
@@ -33,7 +33,7 @@ const DADOS_MINIMOS = {
   instagram: '@studiob',
   email: 'b@studio.com',
   investe_marketing: 'Ainda não invisto',
-  interesses: ['Ainda não sei, quero conversar'],
+  interesses: ['Fotos'],
   consent: true,
   website: ''
 };
@@ -128,7 +128,7 @@ test('validar exige interesses (array não vazio com opções válidas)', () => 
   const invalido = form.validar({ ...DADOS_VALIDOS, interesses: ['Opção inexistente'] });
   assert.ok(invalido.erros.includes('interesses'));
 
-  const multiplo = form.validar({ ...DADOS_VALIDOS, interesses: ['Site', 'Tráfego pago (anúncios)'] });
+  const multiplo = form.validar({ ...DADOS_VALIDOS, interesses: ['Reels', 'Anúncios'] });
   assert.strictEqual(multiplo.ok, true);
 });
 
@@ -158,7 +158,7 @@ test('montarPayload limpa e normaliza dados', () => {
   assert.strictEqual(payload.instagram, '@clinicaaurora');
   assert.strictEqual(payload.email, 'ana@clinica.com');
   assert.strictEqual(payload.investe_marketing, 'Invisto todo mês');
-  assert.deepStrictEqual(payload.interesses, ['Site', 'Gestão de Instagram']);
+  assert.deepStrictEqual(payload.interesses, ['Reels', 'Carrosséis']);
 });
 
 test('montarPayload corta nos limites', () => {
@@ -182,8 +182,9 @@ test('constantes de opções exportadas', () => {
   assert.ok(form.INVESTE_OPCOES.includes('Ainda não invisto'));
 
   assert.ok(Array.isArray(form.INTERESSES_OPCOES));
-  assert.strictEqual(form.INTERESSES_OPCOES.length, 5);
-  assert.ok(form.INTERESSES_OPCOES.includes('Site'));
+  assert.strictEqual(form.INTERESSES_OPCOES.length, 6);
+  assert.ok(form.INTERESSES_OPCOES.includes('Reels'));
+  assert.ok(form.INTERESSES_OPCOES.includes('Anúncios'));
 });
 
 /* ---------- salvarLead (integração com mock) ---------- */
@@ -197,7 +198,7 @@ test('salvarLead insere lead no Supabase via anon key', async () => {
   const lead = estado.leads[0];
   assert.strictEqual(lead.nome, 'Ana Souza');
   assert.strictEqual(lead.email, 'ana@clinica.com');
-  assert.deepStrictEqual(lead.interesses, ['Site', 'Gestão de Instagram']);
+  assert.deepStrictEqual(lead.interesses, ['Reels', 'Carrosséis']);
 });
 
 /* ---------- notifica-lead (webhook) ---------- */
@@ -233,6 +234,8 @@ test('webhook notifica-lead envia e-mail via Resend', async () => {
   assert.ok(email.subject.includes('Clínica Aurora'));
   assert.ok(email.text.includes('12981156417')); // whatsapp limpo
   assert.ok(email.text.includes('@clinicaaurora'));
+  assert.ok(email.text.includes('Reels'));
+  assert.ok(email.text.includes('Carrosséis'));
 });
 
 test('webhook rejeita sem segredo', async () => {

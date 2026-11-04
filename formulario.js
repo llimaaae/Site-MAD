@@ -49,11 +49,12 @@
   ];
 
   const INTERESSES_OPCOES = [
-    'Site',
-    'Gestão de Instagram',
-    'Tráfego pago (anúncios)',
-    'Chatbot de WhatsApp',
-    'Ainda não sei, quero conversar'
+    'Reels',
+    'Carrosséis',
+    'Stories',
+    'Fotos',
+    'Lives',
+    'Anúncios'
   ];
 
   /* ---------- Validação do formulário simplificado ---------- */

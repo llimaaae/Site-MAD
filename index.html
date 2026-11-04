@@ -119,20 +119,22 @@
           <option>Invisto todo mês</option>
           <option>Prefiro conversar sobre isso</option>
         </select></div>
-      <div class="field"><label>Tenho interesse em:</label>
-        <div class="checks" id="interesses-checks">
-          <label class="check-card"><input type="checkbox" name="interesses" value="Site"><span>Site</span></label>
-          <label class="check-card"><input type="checkbox" name="interesses" value="Gestão de Instagram"><span>Gestão de Instagram</span></label>
-          <label class="check-card"><input type="checkbox" name="interesses" value="Tráfego pago (anúncios)"><span>Tráfego pago (anúncios)</span></label>
-          <label class="check-card"><input type="checkbox" name="interesses" value="Chatbot de WhatsApp"><span>Chatbot de WhatsApp</span></label>
-          <label class="check-card"><input type="checkbox" name="interesses" value="Ainda não sei, quero conversar"><span>Ainda não sei, quero conversar</span></label>
+      <div class="field"><label for="interesses-field">Tipo de conteúdo <span class="hint">(marque quantos quiser)</span></label>
+        <div class="chips" id="interesses-chips" role="group" aria-labelledby="interesses-field">
+          <label class="chip"><input type="checkbox" name="interesses" value="Reels"><span>Reels<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span></label>
+          <label class="chip"><input type="checkbox" name="interesses" value="Carrosséis"><span>Carrosséis<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span></label>
+          <label class="chip"><input type="checkbox" name="interesses" value="Stories"><span>Stories<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span></label>
+          <label class="chip"><input type="checkbox" name="interesses" value="Fotos"><span>Fotos<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span></label>
+          <label class="chip"><input type="checkbox" name="interesses" value="Lives"><span>Lives<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span></label>
+          <label class="chip"><input type="checkbox" name="interesses" value="Anúncios"><span>Anúncios<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg></span></label>
         </div>
       </div>
       <input type="hidden" name="website" tabindex="-1" autocomplete="off" style="display:none;">
       <div class="field consent">
-        <label for="consent">
+        <label class="consent-label" for="consent">
           <input type="checkbox" id="consent" required>
-          Autorizo a MAD a entrar em contato comigo sobre meu interesse. Li a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.
+          <span class="consent-check" aria-hidden="true"></span>
+          <span class="consent-text">Autorizo a MAD a entrar em contato comigo sobre meu interesse. Li a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</span>
         </label>
       </div>
       <button class="btn btn-primary" type="submit">Enviar →</button>
