@@ -19,6 +19,7 @@ create extension if not exists pgcrypto;
 alter table leads add column if not exists email text;
 alter table leads add column if not exists investe_marketing text;
 alter table leads add column if not exists interesses text[];
+alter table leads add column if not exists consent boolean default false;
 
 -- Liga a Parte 1 (dados da empresa) com a Parte 2 (dados do
 -- Instagram). Gerado no navegador, um por preenchimento do

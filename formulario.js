@@ -49,12 +49,12 @@
   ];
 
   const INTERESSES_OPCOES = [
-    'Reels',
-    'Carrosséis',
+    'Site',
+    'Tráfego orgânico',
     'Stories',
-    'Fotos',
-    'Lives',
-    'Anúncios'
+    'Carrosséis',
+    'Tráfego pago',
+    'Chatbot de WhatsApp'
   ];
 
   /* ---------- Validação do formulário simplificado ---------- */
