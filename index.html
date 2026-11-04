@@ -100,115 +100,45 @@
   </div>
 
   <div class="card" id="diagnostico">
-    <form id="form">
-      <h2>Diagnóstico gratuito</h2>
-      <small>Analisamos sua presença digital e mostramos onde crescer.</small>
+    <form id="form" novalidate>
+      <h2>Fale com a MAD</h2>
+      <small>Preencha e nossa equipe entra em contato.</small>
 
-      <div class="progresso">
-        <div class="progresso-trilha"><i id="progressoBarra"></i></div>
-        <span class="progresso-texto" id="progressoTexto">Passo 1 de 2</span>
+      <div class="field"><label for="nome">Nome</label><input id="nome" required placeholder="Seu nome" maxlength="100"></div>
+      <div class="field"><label for="empresa">Empresa</label><input id="empresa" required placeholder="Nome da empresa" maxlength="100"></div>
+      <div class="row">
+        <div class="field"><label for="whats">WhatsApp</label><input id="whats" type="tel" inputmode="numeric" autocomplete="tel" required placeholder="(00) 00000-0000" maxlength="15" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Use o formato (00) 00000-0000"></div>
+        <div class="field"><label for="instagram">Instagram</label><input id="instagram" required placeholder="@suaempresa" maxlength="31"></div>
       </div>
-
-      <!-- PASSO 1 — DADOS DA EMPRESA E DO CONTATO -->
-      <div class="passo" id="passo1">
-        <p class="passo-titulo"><b>Passo 1 de 2</b> <span>— Sobre a sua empresa</span></p>
-
-        <div class="field"><label for="nome">Nome</label><input id="nome" required placeholder="Seu nome"></div>
-        <div class="field"><label for="empresa">Empresa</label><input id="empresa" required placeholder="Nome da empresa"></div>
-        <div class="row">
-          <div class="field"><label for="whats">WhatsApp</label><input id="whats" type="tel" inputmode="numeric" maxlength="15" autocomplete="tel" required placeholder="(00) 00000-0000" pattern="\(\d{2}\) \d{4,5}-\d{4}" title="Use o formato (00) 00000-0000"></div>
-          <div class="field"><label for="cidade">Cidade</label><input id="cidade" placeholder="Sua cidade"></div>
+      <div class="field"><label for="email">E-mail</label><input id="email" type="email" required placeholder="seu@email.com" maxlength="150"></div>
+      <div class="field"><label for="investe_marketing">Você já investe em marketing?</label>
+        <select id="investe_marketing" required>
+          <option value="">Selecione</option>
+          <option>Ainda não invisto</option>
+          <option>Invisto de vez em quando</option>
+          <option>Invisto todo mês</option>
+          <option>Prefiro conversar sobre isso</option>
+        </select></div>
+      <div class="field"><label>Tenho interesse em:</label>
+        <div class="checks" id="interesses-checks">
+          <label><input type="checkbox" name="interesses" value="Site"> Site</label>
+          <label><input type="checkbox" name="interesses" value="Gestão de Instagram"> Gestão de Instagram</label>
+          <label><input type="checkbox" name="interesses" value="Tráfego pago (anúncios)"> Tráfego pago (anúncios)</label>
+          <label><input type="checkbox" name="interesses" value="Chatbot de WhatsApp"> Chatbot de WhatsApp</label>
+          <label><input type="checkbox" name="interesses" value="Ainda não sei, quero conversar"> Ainda não sei, quero conversar</label>
         </div>
-        <div class="row">
-          <div class="field"><label for="invest">Investe em marketing?</label>
-            <select id="invest"><option value="">Selecione</option><option>Ainda não</option><option>Até R$ 1.000/mês</option><option>R$ 1.000 a R$ 5.000/mês</option><option>Acima de R$ 5.000/mês</option></select></div>
-          <div class="field"><label for="servico">O que procura?</label>
-            <select id="servico"><option value="">Selecione</option><option>Tráfego pago</option><option>Gestão de redes sociais</option><option>Criação de site</option><option>Estratégia completa</option></select></div>
-        </div>
-        <div class="field"><label for="igPerfil">@ do perfil</label><input id="igPerfil" required placeholder="@suaempresa"></div>
-
-        <div class="field consent">
-          <label for="consent">
-            <input type="checkbox" id="consent" required>
-            Li e concordo com a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> e autorizo o uso dos meus dados para contato e para a geração do diagnóstico com IA.
-          </label>
-        </div>
-
-        <button class="btn btn-primary" type="submit" id="btnParte1">Continuar →</button>
-        <p class="lgpd">Usaremos seus dados apenas para contato e elaboração do diagnóstico. Leia nossa <a href="privacidade.html" class="footer-link">Política de Privacidade</a>.</p>
       </div>
-
-      <!-- PASSO 2 — DADOS DO INSTAGRAM PARA A AVALIAÇÃO -->
-      <div class="passo" id="passo2" hidden>
-        <p class="passo-titulo"><b>Passo 2 de 2</b> <span>— Sobre o seu Instagram</span></p>
-        <p class="beneficio">Responda mais algumas perguntas e receba seu diagnóstico gratuito</p>
-        <small>Analisamos só o que você nos informar. Não acessamos seu perfil.</small>
-
-        <div class="row">
-          <div class="field"><label for="igSeg">Seguidores</label>
-            <select id="igSeg" required>
-              <option value="">Selecione</option>
-              <option>Até 1.000</option><option>1.000 a 5.000</option><option>5.000 a 10.000</option><option>10.000 a 50.000</option><option>Acima de 50.000</option>
-            </select></div>
-          <div class="field"><label for="igPosts">Posts por semana</label>
-            <select id="igPosts" required>
-              <option value="">Selecione</option>
-              <option>Não posto com regularidade</option><option>1</option><option>2-3</option><option>4-6</option><option>7 ou mais</option>
-            </select></div>
-        </div>
-        <div class="row">
-          <div class="field"><label for="igEng">Engajamento e retenção</label>
-            <select id="igEng" required>
-              <option value="">Selecione</option>
-              <option>Alto</option><option>Médio</option><option>Baixo</option><option>Não sei</option>
-            </select></div>
-          <div class="field"><label for="igFreq">Stories e reels por semana</label>
-            <select id="igFreq" required>
-              <option value="">Selecione</option>
-              <option>Todos os dias</option><option>3 a 5 vezes por semana</option><option>1 a 2 vezes por semana</option><option>Raramente</option><option>Não sei / varia muito</option>
-            </select></div>
-        </div>
-        <div class="field"><label>Tipo de conteúdo (marque quantos quiser)</label>
-          <div class="checks">
-            <label><input type="checkbox" name="igConteudo" value="Reels"> Reels</label>
-            <label><input type="checkbox" name="igConteudo" value="Carrosséis"> Carrosséis</label>
-            <label><input type="checkbox" name="igConteudo" value="Stories"> Stories</label>
-            <label><input type="checkbox" name="igConteudo" value="Fotos"> Fotos</label>
-            <label><input type="checkbox" name="igConteudo" value="Lives"> Lives</label>
-            <label><input type="checkbox" name="igConteudo" value="Anúncios"> Anúncios</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field"><label for="igLink">Tem link na bio?</label>
-            <select id="igLink" required><option value="">Selecione</option><option value="sim">Sim</option><option value="nao">Não</option></select></div>
-          <div class="field"><label for="igObj">Principal objetivo</label>
-            <select id="igObj" required>
-              <option value="">Selecione</option>
-              <option>Ganhar mais clientes</option><option>Aumentar seguidores</option><option>Vender online</option><option>Autoridade no nicho</option><option>Reconhecimento da marca</option>
-            </select></div>
-        </div>
-        <div class="field"><label for="igBio">Bio do perfil (máx. 300)</label>
-          <textarea id="igBio" required maxlength="300" rows="3" placeholder="Cole aqui a bio do seu Instagram"></textarea>
-        </div>
-        <div class="field"><label for="igDif">Principal dificuldade hoje</label>
-          <select id="igDif" required>
-            <option value="">Selecione</option>
-            <option>Gerar conteúdo com consistência</option>
-            <option>Ganhar mais clientes</option>
-            <option>Vender mais pelo Instagram</option>
-            <option>Crescer nas buscas (Google)</option>
-            <option>Criar uma identidade visual forte</option>
-            <option>Melhorar anúncios e campanhas</option>
-            <option>Organizar tempo e rotina</option>
-            <option>Não sei / quero explicar na conversa</option>
-          </select>
-        </div>
-
-        <button class="btn btn-primary" type="submit" id="btnParte2">Gerar meu diagnóstico →</button>
-        <button class="btn btn-ghost btn-voltar" type="button" id="btnVoltar">← Voltar</button>
+      <input type="hidden" name="website" tabindex="-1" autocomplete="off" style="display:none;">
+      <div class="field consent">
+        <label for="consent">
+          <input type="checkbox" id="consent" required>
+          Autorizo a MAD a entrar em contato comigo sobre meu interesse. Li a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.
+        </label>
       </div>
+      <button class="btn btn-primary" type="submit">Enviar →</button>
+      <p class="lgpd">Usaremos seus dados apenas para contato comercial. Leia nossa <a href="privacidade.html" class="footer-link">Política de Privacidade</a>.</p>
     </form>
-    <div id="status"><h2 id="msg">Analisando...</h2><div class="loader"><i id="bar"></i></div></div>
+    <div id="status" hidden><h2 id="msg"></h2></div>
   </div>
 </div></div>
 
