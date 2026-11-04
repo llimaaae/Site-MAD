@@ -344,13 +344,27 @@ h1 em,
     transition: 0.2s;
 }
 
-/* múltipla escolha */
+/* múltipla escolha - cards estilizados */
 .checks { display: flex; flex-wrap: wrap; gap: 10px 16px; }
-.checks label {
-    display: inline-flex; align-items: center; gap: 6px;
+.check-card {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--navy);
+    border: 1px solid var(--line);
+    border-radius: 8px;
     font-size: 13px; color: #c4cfe0; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
-.checks input { accent-color: var(--blue); }
+.check-card:hover { border-color: var(--blue); }
+.check-card:has(input:checked) {
+    border-color: var(--blue);
+    background: rgba(0, 159, 227, 0.08);
+    box-shadow: 0 0 0 1px var(--blue);
+}
+.check-card input { 
+    accent-color: var(--blue); 
+    width: 16px; height: 16px;
+}
 
 /* consentimento LGPD */
 .consent label {
@@ -380,29 +394,44 @@ h1 em,
     color: #6d7b92;
 }
 
-/* Tela de "Analisando..." (aparece depois do envio) */
+/* Tela de sucesso */
 #status {
     display: none;
-    padding: 30px 0;
+    padding: 40px 20px;
     text-align: center;
 }
 
-.loader {
-    height: 4px;
-    margin-top: 20px;
-
-    background: var(--line);
-    border-radius: 4px;
-    overflow: hidden;
+#status.success {
+    display: block;
+    animation: fadeIn 0.4s ease;
 }
 
-.loader i {
-    display: block;
-    width: 0;
-    height: 100%;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+}
 
-    background: var(--blue);
-    transition: width 2.4s ease;
+#status h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--light);
+    margin-bottom: 12px;
+}
+
+#status p {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#status .success-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
 }
 
 

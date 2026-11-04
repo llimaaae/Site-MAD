@@ -110,7 +110,25 @@ async function enviar() {
 function sucesso() {
   form.style.display = 'none';
   status.hidden = false;
-  msg.textContent = 'Enviado! Nossa equipe vai entrar em contato pelo WhatsApp ou e-mail.';
+  status.classList.add('success');
+  msg.innerHTML = `
+    <h2>Enviado com sucesso!</h2>
+    <p>Nossa equipe vai analisar seu perfil e entrar em contato pelo WhatsApp ou e-mail.</p>
+    <div class="success-actions">
+      <a href="https://wa.me/5512981156417?text=${encodeURIComponent('Olá! Preenchi o formulário no site da MAD e gostaria de falar com a equipe.')}" 
+         target="_blank" rel="noopener noreferrer" class="btn btn-primary">Falar no WhatsApp →</a>
+      <button class="btn btn-ghost" onclick="resetarFormulario()">Enviar outro</button>
+    </div>
+  `;
+}
+
+/* ---------- Reset do formulário ---------- */
+function resetarFormulario() {
+  form.reset();
+  form.style.display = 'block';
+  status.hidden = true;
+  status.classList.remove('success');
+  msg.innerHTML = '';
 }
 
 /* ---------- Avisos e botão WhatsApp ---------- */
