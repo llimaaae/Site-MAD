@@ -1,6 +1,6 @@
 /* ==========================================================
    MAD — tests/formulario.test.js
-   Lógica do formulário em 2 partes (parte 1 e parte 2).
+   Formulário comercial simplificado (1 etapa).
    ========================================================== */
 'use strict';
 
@@ -14,101 +14,201 @@ const SUPABASE_KEY = 'sb_publishable_teste';
 
 const form = require('../formulario.js');
 
-const DADOS_PARTE1 = {
+const DADOS_VALIDOS = {
   nome: 'Ana Souza',
   empresa: 'Clínica Aurora',
   whatsapp: '(12) 98115-6417',
-  instagram: '@clinic Aurora',
-  cidade: 'São Paulo',
-  investimento: 'R$ 1.000 a R$ 5.000/mês',
-  servico: 'Gestão de redes sociais',
-  consent: true
+  instagram: '@clinicaaurora',
+  email: 'ana@clinica.com',
+  investe_marketing: 'Invisto todo mês',
+  interesses: ['Site', 'Gestão de Instagram'],
+  consent: true,
+  website: '' // honeypot vazio
 };
 
-const DADOS_PARTE2 = {
-  seguidores: '1.000 a 5.000',
-  posts: '2-3',
-  conteudos: ['Reels', 'Stories'],
-  engajamento: 'Médio',
-  frequenciaStories: '3 a 5 vezes por semana',
-  linkBio: 'sim',
-  bio: 'Clínica de estética em SP. Agende pelo link.',
-  objetivo: 'Ganhar mais clientes',
-  dificuldade: 'Gerar conteúdo com consistência'
+const DADOS_MINIMOS = {
+  nome: 'Bruno',
+  empresa: 'Studio B',
+  whatsapp: '(11) 90000-0000',
+  instagram: '@studiob',
+  email: 'b@studio.com',
+  investe_marketing: 'Ainda não invisto',
+  interesses: ['Ainda não sei, quero conversar'],
+  consent: true,
+  website: ''
 };
 
-/* ---------- lead_id ---------- */
-test('gerarLeadId devolve um uuid v4 diferente a cada chamada', () => {
-  const a = form.gerarLeadId();
-  const b = form.gerarLeadId();
-  assert.match(a, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
-  assert.notStrictEqual(a, b);
+/* ---------- normalizarInstagram ---------- */
+test('normalizarInstagram adiciona @ e remove espaços', () => {
+  assert.strictEqual(form.normalizarInstagram('clinicaaurora'), '@clinicaaurora');
+  assert.strictEqual(form.normalizarInstagram('@clinicaaurora'), '@clinicaaurora');
+  assert.strictEqual(form.normalizarInstagram('  @clinica  '), '@clinica');
+  assert.strictEqual(form.normalizarInstagram('@@duplicado'), '@duplicado');
+  assert.strictEqual(form.normalizarInstagram(''), '');
 });
 
-/* ---------- Parte 1 ---------- */
-test('validarParte1 exige nome, empresa, whatsapp, instagram e consentimento', () => {
-  assert.strictEqual(form.validarParte1(DADOS_PARTE1).ok, true);
+/* ---------- validarEmail ---------- */
+test('validarEmail aceita e-mails válidos e rejeita inválidos', () => {
+  assert.strictEqual(form.validarEmail('a@b.com'), true);
+  assert.strictEqual(form.validarEmail('ana@clinica.com.br'), true);
+  assert.strictEqual(form.validarEmail(''), false);
+  assert.strictEqual(form.validarEmail('invalido'), false);
+  assert.strictEqual(form.validarEmail('a@b'), false);
+  assert.strictEqual(form.validarEmail('@sem-local.com'), false);
+});
 
-  const semConsent = form.validarParte1(Object.assign({}, DADOS_PARTE1, { consent: false }));
+/* ---------- validarWhatsApp ---------- */
+test('validarWhatsApp aceita 10 ou 11 dígitos', () => {
+  assert.strictEqual(form.validarWhatsApp('(12) 98115-6417'), true); // 11 dígitos
+  assert.strictEqual(form.validarWhatsApp('(11) 9000-0000'), true); // 10 dígitos
+  assert.strictEqual(form.validarWhatsApp('12981156417'), true);
+  assert.strictEqual(form.validarWhatsApp('11900000000'), true);
+  assert.strictEqual(form.validarWhatsApp('123'), false);
+  assert.strictEqual(form.validarWhatsApp(''), false);
+});
+
+/* ---------- validarInstagram ---------- */
+test('validarInstagram aceita formato válido até 30 chars', () => {
+  assert.strictEqual(form.validarInstagram('@clinicaaurora'), true);
+  assert.strictEqual(form.validarInstagram('clinicaaurora'), true);
+  assert.strictEqual(form.validarInstagram('@' + 'a'.repeat(30)), true);
+  assert.strictEqual(form.validarInstagram('@' + 'a'.repeat(31)), false);
+  assert.strictEqual(form.validarInstagram('@invalido!'), false);
+  assert.strictEqual(form.validarInstagram(''), false);
+});
+
+/* ---------- validar (formulário completo) ---------- */
+test('validar aceita dados completos e válidos', () => {
+  const r = form.validar(DADOS_VALIDOS);
+  assert.strictEqual(r.ok, true);
+  assert.deepStrictEqual(r.erros, []);
+});
+
+test('validar rejeita campos obrigatórios vazios', () => {
+  const semNome = form.validar({ ...DADOS_VALIDOS, nome: '' });
+  assert.strictEqual(semNome.ok, false);
+  assert.ok(semNome.erros.includes('nome'));
+
+  const semEmpresa = form.validar({ ...DADOS_VALIDOS, empresa: '' });
+  assert.ok(semEmpresa.erros.includes('empresa'));
+
+  const semWhatsApp = form.validar({ ...DADOS_VALIDOS, whatsapp: '' });
+  assert.ok(semWhatsApp.erros.includes('whatsapp'));
+
+  const semInstagram = form.validar({ ...DADOS_VALIDOS, instagram: '' });
+  assert.ok(semInstagram.erros.includes('instagram'));
+
+  const semEmail = form.validar({ ...DADOS_VALIDOS, email: '' });
+  assert.ok(semEmail.erros.includes('email'));
+
+  const emailInvalido = form.validar({ ...DADOS_VALIDOS, email: 'invalido' });
+  assert.ok(emailInvalido.erros.includes('email'));
+});
+
+test('validar exige consentimento', () => {
+  const semConsent = form.validar({ ...DADOS_VALIDOS, consent: false });
   assert.strictEqual(semConsent.ok, false);
   assert.ok(semConsent.erros.includes('consent'));
-
-  const semNome = form.validarParte1(Object.assign({}, DADOS_PARTE1, { nome: '   ' }));
-  assert.ok(semNome.erros.includes('nome'));
 });
 
-test('montarPayloadParte1 leva o lead_id e limpa os textos', () => {
-  const leadId = form.gerarLeadId();
-  const payload = form.montarPayloadParte1(DADOS_PARTE1, leadId);
-  assert.strictEqual(payload.lead_id, leadId);
+test('validar exige investe_marketing válido', () => {
+  const invalido = form.validar({ ...DADOS_VALIDOS, investe_marketing: 'Opção inexistente' });
+  assert.strictEqual(invalido.ok, false);
+  assert.ok(invalido.erros.includes('investe_marketing'));
+
+  const vazio = form.validar({ ...DADOS_VALIDOS, investe_marketing: '' });
+  assert.ok(vazio.erros.includes('investe_marketing'));
+});
+
+test('validar exige interesses (array não vazio com opções válidas)', () => {
+  const vazio = form.validar({ ...DADOS_VALIDOS, interesses: [] });
+  assert.strictEqual(vazio.ok, false);
+  assert.ok(vazio.erros.includes('interesses'));
+
+  const invalido = form.validar({ ...DADOS_VALIDOS, interesses: ['Opção inexistente'] });
+  assert.ok(invalido.erros.includes('interesses'));
+
+  const multiplo = form.validar({ ...DADOS_VALIDOS, interesses: ['Site', 'Tráfego pago (anúncios)'] });
+  assert.strictEqual(multiplo.ok, true);
+});
+
+test('validar honeypot: se preenchido, simula sucesso (erro honeypot)', () => {
+  const preenchido = form.validar({ ...DADOS_VALIDOS, website: 'spam' });
+  assert.strictEqual(preenchido.ok, false);
+  assert.ok(preenchido.erros.includes('honeypot'));
+});
+
+test('validar limite de caracteres', () => {
+  const nomeLongo = form.validar({ ...DADOS_VALIDOS, nome: 'a'.repeat(101) });
+  assert.ok(nomeLongo.erros.includes('nome'));
+
+  const empresaLonga = form.validar({ ...DADOS_VALIDOS, empresa: 'a'.repeat(101) });
+  assert.ok(empresaLonga.erros.includes('empresa'));
+
+  const emailLongo = form.validar({ ...DADOS_VALIDOS, email: 'a'.repeat(150) + '@b.com' });
+  assert.ok(emailLongo.erros.includes('email'));
+});
+
+/* ---------- montarPayload ---------- */
+test('montarPayload limpa e normaliza dados', () => {
+  const payload = form.montarPayload(DADOS_VALIDOS);
   assert.strictEqual(payload.nome, 'Ana Souza');
   assert.strictEqual(payload.empresa, 'Clínica Aurora');
-  assert.strictEqual(payload.whatsapp, '(12) 98115-6417');
-  assert.strictEqual(payload.instagram, '@clinic Aurora');
-  assert.strictEqual(payload.cidade, 'São Paulo');
-  assert.strictEqual(payload.investimento, 'R$ 1.000 a R$ 5.000/mês');
-  assert.strictEqual(payload.servico, 'Gestão de redes sociais');
+  assert.strictEqual(payload.whatsapp, '12981156417'); // só números
+  assert.strictEqual(payload.instagram, '@clinicaaurora');
+  assert.strictEqual(payload.email, 'ana@clinica.com');
+  assert.strictEqual(payload.investe_marketing, 'Invisto todo mês');
+  assert.deepStrictEqual(payload.interesses, ['Site', 'Gestão de Instagram']);
 });
 
-/* ---------- Parte 2 ---------- */
-test('validarParte2 aponta o campo que falta', () => {
-  assert.strictEqual(form.validarParte2(DADOS_PARTE2).ok, true);
-
-  const semConteudo = form.validarParte2(Object.assign({}, DADOS_PARTE2, { conteudos: [] }));
-  assert.ok(semConteudo.erros.includes('conteudos'));
-
-  const semBio = form.validarParte2(Object.assign({}, DADOS_PARTE2, { bio: '' }));
-  assert.ok(semBio.erros.includes('bio'));
+test('montarPayload corta nos limites', () => {
+  const payload = form.montarPayload({
+    ...DADOS_VALIDOS,
+    nome: 'a'.repeat(150),
+    empresa: 'b'.repeat(150),
+    email: 'c'.repeat(200) + '@d.com',
+    instagram: '@' + 'x'.repeat(50)
+  });
+  assert.strictEqual(payload.nome.length, 100);
+  assert.strictEqual(payload.empresa.length, 100);
+  assert.strictEqual(payload.email.length, 150);
+  assert.strictEqual(payload.instagram.length, 31); // @ + 30
 });
 
-test('montarPayloadParte2 corta a bio em 300 caracteres', () => {
-  const leadId = form.gerarLeadId();
-  const bio = 'x'.repeat(400);
-  const payload = form.montarPayloadParte2(Object.assign({}, DADOS_PARTE2, { bio }), leadId);
-  assert.strictEqual(payload.bio.length, 300);
-  assert.strictEqual(payload.lead_id, leadId);
-  assert.deepStrictEqual(payload.conteudos, ['Reels', 'Stories']);
-  assert.strictEqual(payload.linkBio, 'sim');
+/* ---------- INVESTE_OPCOES e INTERESSES_OPCOES exportados ---------- */
+test('constantes de opções exportadas', () => {
+  assert.ok(Array.isArray(form.INVESTE_OPCOES));
+  assert.strictEqual(form.INVESTE_OPCOES.length, 4);
+  assert.ok(form.INVESTE_OPCOES.includes('Ainda não invisto'));
+
+  assert.ok(Array.isArray(form.INTERESSES_OPCOES));
+  assert.strictEqual(form.INTERESSES_OPCOES.length, 5);
+  assert.ok(form.INTERESSES_OPCOES.includes('Site'));
 });
 
-/* ---------- Fluxo: abandonar na Parte 1 ---------- */
-test('abandonar na Parte 1: o lead chega no banco e o e-mail de aviso é disparado', async () => {
+/* ---------- salvarLead (integração com mock) ---------- */
+test('salvarLead insere lead no Supabase via anon key', async () => {
   const estado = instalarFetch({});
-  const leadId = form.gerarLeadId();
-  const payload = form.montarPayloadParte1(DADOS_PARTE1, leadId);
+  const payload = form.montarPayload(DADOS_VALIDOS);
 
   await form.salvarLead(SUPABASE_URL, SUPABASE_KEY, payload);
 
-  // o lead foi gravado (e só uma vez)
   assert.strictEqual(estado.leads.length, 1);
-  assert.strictEqual(estado.leads[0].lead_id, leadId);
-  assert.strictEqual(estado.leads[0].nome, 'Ana Souza');
+  const lead = estado.leads[0];
+  assert.strictEqual(lead.nome, 'Ana Souza');
+  assert.strictEqual(lead.email, 'ana@clinica.com');
+  assert.deepStrictEqual(lead.interesses, ['Site', 'Gestão de Instagram']);
+});
 
-  // e nenhum diagnóstico foi pedido
-  assert.strictEqual(estado.diagnosticos.length, 0);
-  assert.strictEqual(estado.groqChamadas.length, 0);
+/* ---------- notifica-lead (webhook) ---------- */
+test('webhook notifica-lead envia e-mail via Resend', async () => {
+  const estado = instalarFetch({});
 
-  // o webhook do Supabase transforma o INSERT no e-mail de aviso (1º e-mail)
+  // insere lead direto no mock
+  const payload = form.montarPayload(DADOS_VALIDOS);
+  await form.salvarLead(SUPABASE_URL, SUPABASE_KEY, payload);
+  const lead = estado.leads[0];
+
   process.env.WEBHOOK_SECRET = 'segredo-de-teste';
   process.env.RESEND_API_KEY = 'resend-de-teste';
   process.env.LEAD_EMAIL = 'mad@exemplo.com';
@@ -119,117 +219,60 @@ test('abandonar na Parte 1: o lead chega no banco e o e-mail de aviso é dispara
   const req = criarReq({
     method: 'POST',
     headers: { 'x-webhook-secret': 'segredo-de-teste' },
-    body: { type: 'INSERT', table: 'leads', record: estado.leads[0] }
+    body: { type: 'INSERT', table: 'leads', record: lead }
   });
   const res = criarRes();
   await notifica(req, res);
 
   assert.strictEqual(res.statusCode, 200);
   assert.strictEqual(estado.emails.length, 1);
-  assert.strictEqual(estado.emails[0].to[0], 'mad@exemplo.com');
-  assert.ok(estado.emails[0].subject.includes('Ana Souza'));
-});
-
-test('voltar e reenviar a Parte 1 não duplica o lead', async () => {
-  const estado = instalarFetch({});
-  const leadId = form.gerarLeadId();
-  const payload = form.montarPayloadParte1(DADOS_PARTE1, leadId);
-
-  await form.salvarLead(SUPABASE_URL, SUPABASE_KEY, payload, '');
-  assert.strictEqual(estado.leads.length, 1);
-
-  // a pessoa volta, corrige o nome e reenvia com o mesmo lead_id
-  const payload2 = form.montarPayloadParte1(Object.assign({}, DADOS_PARTE1, { nome: 'Ana Souza Lima' }), leadId);
-  const r = await form.salvarLead(SUPABASE_URL, SUPABASE_KEY, payload2, leadId);
-
-  assert.strictEqual(estado.leads.length, 1, 'continua com um lead só');
-  assert.strictEqual(estado.leads[0].nome, 'Ana Souza Lima', 'o lead foi atualizado');
-  assert.strictEqual(r.criado, false);
-});
-
-/* ---------- Fluxo: as duas partes ---------- */
-test('completar as 2 partes: 1 lead, 1 diagnóstico e 2 e-mails', async () => {
-  process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-de-teste';
-  process.env.SUPABASE_URL = SUPABASE_URL;
-  process.env.RESEND_API_KEY = 'resend-de-teste';
-  process.env.LEAD_EMAIL = 'mad@exemplo.com';
-  process.env.SITE_URL = 'https://mad.vercel.app';
-  process.env.IP_HASH_SALT = 'salt-de-teste';
-  process.env.GROQ_API_KEY = 'groq-de-teste';
-
-  const estado = instalarFetch({
-    leads: [{
-      id: 1, lead_id: '11111111-1111-4111-8111-111111111111',
-      nome: 'Ana Souza', empresa: 'Clínica Aurora', whatsapp: '(12) 98115-6417',
-      instagram: '@clinicaaurora', cidade: 'São Paulo',
-      investimento: 'R$ 1.000 a R$ 5.000/mês', servico: 'Gestão de redes sociais'
-    }]
-  });
-
-  const diagnostico = require('../api/diagnostico.js');
-
-  const payload = form.montarPayloadParte2(DADOS_PARTE2, '11111111-1111-4111-8111-111111111111');
-  const req = criarReq({ method: 'POST', headers: {}, body: payload });
-  const res = criarRes();
-  await diagnostico(req, res);
-
-  assert.strictEqual(res.statusCode, 200);
-  assert.ok(res.corpo.id, 'devolve o id do diagnóstico');
-
-  // lead continua sendo um só
-  assert.strictEqual(estado.leads.length, 1);
-
-  // diagnóstico salvo com as duas partes
-  assert.strictEqual(estado.diagnosticos.length, 1);
-  const diag = estado.diagnosticos[0];
-  assert.strictEqual(diag.lead_id, '11111111-1111-4111-8111-111111111111');
-  assert.strictEqual(diag.nome, 'Ana Souza');
-  assert.strictEqual(diag.seguidores, '1.000 a 5.000');
-  assert.strictEqual(diag.engajamento, 'Médio');
-  assert.strictEqual(diag.frequencia_stories, '3 a 5 vezes por semana');
-  assert.strictEqual(diag.dificuldade, 'Gerar conteúdo com consistência');
-  assert.ok(diag.expira_em, 'tem prazo de expiração');
-  assert.match(diag.token, /^[A-Za-z0-9_-]{32,64}$/, 'token público aleatório longo');
-
-  // 1 e-mail de diagnóstico (o 1º, do lead, vem do webhook)
-  assert.strictEqual(estado.emails.length, 1);
   const email = estado.emails[0];
+  assert.strictEqual(email.to[0], 'mad@exemplo.com');
+  assert.ok(email.subject.startsWith('Novo lead: '));
   assert.ok(email.subject.includes('Ana Souza'));
-  assert.ok(email.subject.includes('@clinicaaurora'));
-  assert.ok(email.text.includes('11111111-1111-4111-8111-111111111111'), 'leva o lead_id');
-  assert.ok(email.text.includes('https://mad.vercel.app/resultado.html?id='), 'leva o link do resultado');
-  assert.ok(!email.text.includes('ip_hash'), 'não leva hash de IP');
-  assert.ok(!email.text.includes('service-role'), 'não leva segredo');
+  assert.ok(email.subject.includes('Clínica Aurora'));
+  assert.ok(email.text.includes('12981156417')); // whatsapp limpo
+  assert.ok(email.text.includes('@clinicaaurora'));
 });
 
-test('repetir a Parte 2 com o mesmo lead não duplica diagnóstico nem e-mail', async () => {
-  process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-de-teste';
-  process.env.RESEND_API_KEY = 'resend-de-teste';
-  process.env.LEAD_EMAIL = 'mad@exemplo.com';
-  process.env.SITE_URL = 'https://mad.vercel.app';
-  process.env.IP_HASH_SALT = 'salt-de-teste';
-  process.env.GROQ_API_KEY = 'groq-de-teste';
+test('webhook rejeita sem segredo', async () => {
+  const estado = instalarFetch({});
+  const payload = form.montarPayload(DADOS_VALIDOS);
+  await form.salvarLead(SUPABASE_URL, SUPABASE_KEY, payload);
+  const lead = estado.leads[0];
 
-  const estado = instalarFetch({
-    leads: [{
-      id: 1, lead_id: '22222222-2222-4222-8222-222222222222',
-      nome: 'Bruno Lima', empresa: 'Studio B', whatsapp: '(11) 90000-0000',
-      instagram: '@studiob', cidade: 'Campinas', investimento: 'Ainda não', servico: 'Tráfego pago'
-    }]
+  process.env.WEBHOOK_SECRET = 'segredo-de-teste';
+  delete require.cache[require.resolve('../api/notifica-lead.js')];
+  const notifica = require('../api/notifica-lead.js');
+
+  const req = criarReq({
+    method: 'POST',
+    headers: {},
+    body: { type: 'INSERT', table: 'leads', record: lead }
   });
+  const res = criarRes();
+  await notifica(req, res);
 
-  const diagnostico = require('../api/diagnostico.js');
-  const payload = form.montarPayloadParte2(DADOS_PARTE2, '22222222-2222-4222-8222-222222222222');
+  assert.strictEqual(res.statusCode, 401);
+});
 
-  const r1 = criarRes();
-  await diagnostico(criarReq({ method: 'POST', body: payload }), r1);
-  assert.strictEqual(r1.statusCode, 200);
+test('webhook rejeita segredo errado', async () => {
+  const estado = instalarFetch({});
+  const payload = form.montarPayload(DADOS_VALIDOS);
+  await form.salvarLead(SUPABASE_URL, SUPABASE_KEY, payload);
+  const lead = estado.leads[0];
 
-  const r2 = criarRes();
-  await diagnostico(criarReq({ method: 'POST', body: payload }), r2);
-  assert.strictEqual(r2.statusCode, 409);
-  assert.strictEqual(r2.corpo.erro, 'diagnostico-existente');
+  process.env.WEBHOOK_SECRET = 'segredo-correto';
+  delete require.cache[require.resolve('../api/notifica-lead.js')];
+  const notifica = require('../api/notifica-lead.js');
 
-  assert.strictEqual(estado.diagnosticos.length, 1, 'continua com um diagnóstico só');
-  assert.strictEqual(estado.emails.length, 1, 'não envia o e-mail duas vezes');
+  const req = criarReq({
+    method: 'POST',
+    headers: { 'x-webhook-secret': 'segredo-errado' },
+    body: { type: 'INSERT', table: 'leads', record: lead }
+  });
+  const res = criarRes();
+  await notifica(req, res);
+
+  assert.strictEqual(res.statusCode, 401);
 });

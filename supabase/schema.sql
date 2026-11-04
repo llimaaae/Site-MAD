@@ -15,6 +15,11 @@ create extension if not exists pgcrypto;
 -- Só adicionamos colunas — nenhuma linha é alterada ou apagada.
 -- ------------------------------------------------------------
 
+-- Colunas do formulário simplificado
+alter table leads add column if not exists email text;
+alter table leads add column if not exists investe_marketing text;
+alter table leads add column if not exists interesses text[];
+
 -- Liga a Parte 1 (dados da empresa) com a Parte 2 (dados do
 -- Instagram). Gerado no navegador, um por preenchimento do
 -- formulário: nunca duplica o lead.
@@ -23,6 +28,9 @@ alter table leads add column if not exists lead_id uuid;
 -- Um lead_id por linha (protege contra lead duplicado).
 create unique index if not exists leads_lead_id_uniq
   on leads (lead_id) where lead_id is not null;
+
+-- Índice para busca por e-mail
+create index if not exists leads_email_idx on leads (email);
 
 -- ------------------------------------------------------------
 -- analises_log: controle de uso (rate limit) por contato e por IP

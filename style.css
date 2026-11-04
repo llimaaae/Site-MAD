@@ -505,6 +505,14 @@ section {
     color: var(--light);
 }
 
+/* Preço do plano (destacado, azul sólido — sem gradiente em texto) */
+.plan .preco {
+    font-family: Montserrat, sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--blue);
+}
+
 .plan ul {
     list-style: none;
     margin: 22px 0;

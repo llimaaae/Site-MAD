@@ -1,9 +1,9 @@
 /* ==========================================================
    MAD — formulario.js
-   Lógica do formulário em 2 partes (sem DOM):
+   Lógica do formulário comercial simplificado (1 etapa, sem DOM).
    - validação do que a pessoa preencheu;
-   - montagem dos payloads (Parte 1 e Parte 2);
-   - geração do lead_id que liga as duas partes.
+   - montagem do payload para o Supabase.
+   - honeypot anti-robô.
 
    É carregado como script no site e também é importado pelos
    testes (Node), por isso não depende de DOM.
@@ -11,118 +11,91 @@
 (function (global) {
   'use strict';
 
-  /* ---------- lead_id (uuid v4) ----------
-     Gera no navegador e viaja para o banco (tabela leads).
-     Serve para ligar a Parte 1 e a Parte 2 sem duplicar o lead. */
-  function gerarLeadId() {
-    const c = global.crypto;
-    if (c && typeof c.randomUUID === 'function') return c.randomUUID();
-
-    // Fallback para navegadores sem randomUUID
-    const b = new Uint8Array(16);
-    if (c && typeof c.getRandomValues === 'function') {
-      c.getRandomValues(b);
-    } else {
-      for (let i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
-    }
-    b[6] = (b[6] & 0x0f) | 0x40;
-    b[8] = (b[8] & 0x3f) | 0x80;
-    const h = Array.prototype.map.call(b, (x) => x.toString(16).padStart(2, '0')).join('');
-    return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) + '-' +
-      h.slice(16, 20) + '-' + h.slice(20);
-  }
-
   function texto(v) {
     return String(v == null ? '' : v).trim();
   }
 
-  /* ---------- Parte 1: dados da empresa e do contato ---------- */
-  function validarParte1(d) {
+  function normalizarInstagram(v) {
+    if (!v) return '';
+    const s = String(v).trim().replace(/\s+/g, '');
+    // remove @ duplicado
+    const limpo = s.replace(/^@+/, '');
+    return limpo.length > 0 ? '@' + limpo : '';
+  }
+
+  function validarEmail(v) {
+    if (!v) return false;
+    // RFC 5322 simplificado: local@domain.tld
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  }
+
+  function validarWhatsApp(v) {
+    if (!v) return false;
+    const n = String(v).replace(/\D/g, '');
+    return n.length === 10 || n.length === 11;
+  }
+
+  function validarInstagram(v) {
+    if (!v) return false;
+    const limpo = String(v).replace('@', '');
+    return /^[A-Za-z0-9._]{1,30}$/.test(limpo);
+  }
+
+  const INVESTE_OPCOES = [
+    'Ainda não invisto',
+    'Invisto de vez em quando',
+    'Invisto todo mês',
+    'Prefiro conversar sobre isso'
+  ];
+
+  const INTERESSES_OPCOES = [
+    'Site',
+    'Gestão de Instagram',
+    'Tráfego pago (anúncios)',
+    'Chatbot de WhatsApp',
+    'Ainda não sei, quero conversar'
+  ];
+
+  /* ---------- Validação do formulário simplificado ---------- */
+  function validar(d) {
     const erros = [];
     d = d || {};
 
-    if (!texto(d.nome)) erros.push('nome');
-    if (!texto(d.empresa)) erros.push('empresa');
-    if (!texto(d.whatsapp)) erros.push('whatsapp');
-    if (!texto(d.instagram)) erros.push('instagram');
+    if (!texto(d.nome) || texto(d.nome).length > 100) erros.push('nome');
+    if (!texto(d.empresa) || texto(d.empresa).length > 100) erros.push('empresa');
+    if (!validarWhatsApp(d.whatsapp)) erros.push('whatsapp');
+    if (!validarInstagram(d.instagram)) erros.push('instagram');
+    if (!validarEmail(d.email) || texto(d.email).length > 150) erros.push('email');
+    if (!INVESTE_OPCOES.includes(texto(d.investe_marketing))) erros.push('investe_marketing');
+    if (!Array.isArray(d.interesses) || d.interesses.length === 0 || !d.interesses.every(i => INTERESSES_OPCOES.includes(texto(i)))) erros.push('interesses');
     if (d.consent !== true) erros.push('consent');
+    // honeypot: se preenchido, simula sucesso mas não envia
+    if (texto(d.website)) erros.push('honeypot');
 
     return { ok: erros.length === 0, erros };
   }
 
-  function montarPayloadParte1(d, leadId) {
+  /* ---------- Monta payload para o Supabase (tabela leads) ---------- */
+  function montarPayload(d) {
     d = d || {};
     return {
-      nome: texto(d.nome),
-      empresa: texto(d.empresa),
-      whatsapp: texto(d.whatsapp),
-      instagram: texto(d.instagram),
-      cidade: texto(d.cidade),
-      investimento: texto(d.investimento),
-      servico: texto(d.servico),
-      lead_id: leadId
+      nome: texto(d.nome).slice(0, 100),
+      empresa: texto(d.empresa).slice(0, 100),
+      whatsapp: texto(d.whatsapp).replace(/\D/g, '').slice(0, 11),
+      instagram: normalizarInstagram(d.instagram).slice(0, 31), // @ + 30 chars
+      email: texto(d.email).toLowerCase().slice(0, 150),
+      investe_marketing: texto(d.investe_marketing),
+      interesses: (d.interesses || []).map(texto).filter(Boolean)
     };
   }
 
-  /* ---------- Parte 2: dados do Instagram para a avaliação ---------- */
-  function validarParte2(d) {
-    const erros = [];
-    d = d || {};
-
-    if (!texto(d.seguidores)) erros.push('seguidores');
-    if (!texto(d.posts)) erros.push('posts');
-    if (!Array.isArray(d.conteudos) || !d.conteudos.length) erros.push('conteudos');
-    if (!texto(d.engajamento)) erros.push('engajamento');
-    if (!texto(d.frequenciaStories)) erros.push('frequenciaStories');
-    if (!texto(d.linkBio)) erros.push('linkBio');
-    if (!texto(d.bio)) erros.push('bio');
-    if (texto(d.bio).length > 300) erros.push('bio');
-    if (!texto(d.objetivo)) erros.push('objetivo');
-    if (!texto(d.dificuldade)) erros.push('dificuldade');
-
-    return { ok: erros.length === 0, erros };
-  }
-
-  function montarPayloadParte2(d, leadId) {
-    d = d || {};
-    return {
-      lead_id: leadId,
-      seguidores: texto(d.seguidores),
-      posts: texto(d.posts),
-      conteudos: (d.conteudos || []).map(texto).filter(Boolean),
-      engajamento: texto(d.engajamento),
-      frequenciaStories: texto(d.frequenciaStories),
-      linkBio: texto(d.linkBio),
-      bio: texto(d.bio).slice(0, 300),
-      objetivo: texto(d.objetivo),
-      dificuldade: texto(d.dificuldade)
-    };
-  }
-
-  /* ---------- Parte 1: salva o lead no Supabase ----------
-     O e-mail de aviso para a MAD é disparado pelo webhook do
-     Supabase quando o registro entra na tabela "leads".
-
-     Se o lead já foi salvo antes (a pessoa voltou para corrigir
-     algo), o registro é atualizado no lugar — nunca duplicado.
-     leadId anterior: '' quando é a primeira vez. */
-  async function salvarLead(url, chave, dados, leadIdAnterior) {
+  /* ---------- Salva lead no Supabase (INSERT anon) ---------- */
+  async function salvarLead(url, chave, dados) {
     const headers = {
       'Content-Type': 'application/json',
       'apikey': chave,
       'Prefer': 'return=minimal'
     };
-
-    if (leadIdAnterior && leadIdAnterior === dados.lead_id) {
-      // atualiza o lead já existente (sem criar outro registro)
-      const atualizou = await fetch(url + '/rest/v1/leads?lead_id=eq.' + encodeURIComponent(dados.lead_id), {
-        method: 'PATCH',
-        headers: headers,
-        body: JSON.stringify(dados)
-      });
-      if (atualizou.ok) return { criado: false };
-      // sem permissão de update: tenta inserir (e trata o conflito como "já salvo")
-    }
 
     const resposta = await fetch(url + '/rest/v1/leads', {
       method: 'POST',
@@ -131,33 +104,26 @@
     });
 
     if (resposta.ok) return { criado: true };
-    if (resposta.status === 409) return { criado: false };  // lead_id já existe
+    if (resposta.status === 409) return { criado: false }; // lead_id duplicado (não deve ocorrer)
+    if (resposta.status === 42501) {
+      const detalhe = await resposta.text();
+      throw new Error('Permissão negada: ' + detalhe);
+    }
 
     const detalhe = await resposta.text();
     throw new Error('Erro ' + resposta.status + ': ' + detalhe);
   }
 
-  /* ---------- Parte 2: pede o diagnóstico ---------- */
-  async function enviarDiagnostico(payload) {
-    const resposta = await fetch('/api/diagnostico', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    let json = {};
-    try { json = await resposta.json(); } catch (e) { json = {}; }
-    return { ok: resposta.ok, status: resposta.status, json: json };
-  }
-
   const api = {
-    gerarLeadId,
+    validar,
+    montarPayload,
     salvarLead,
-    enviarDiagnostico,
-    validarParte1,
-    montarPayloadParte1,
-    validarParte2,
-    montarPayloadParte2
+    normalizarInstagram,
+    validarEmail,
+    validarWhatsApp,
+    validarInstagram,
+    INVESTE_OPCOES,
+    INTERESSES_OPCOES
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
