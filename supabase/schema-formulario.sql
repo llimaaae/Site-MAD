@@ -46,7 +46,9 @@ exception when duplicate_object or undefined_object then null; end $$;
 do $$
 begin
   alter table leads add constraint leads_whatsapp_len
-    check (whatsapp is null or char_length(regexp_replace(whatsapp, '\D', '', 'g')) between 10 and 11);
+    -- linhas antigas têm formatos variados (ex.: 0, 1 ou 14 dígitos);
+    -- a regra nova só limita o TAMANHO. O formulário novo grava 10-11.
+    check (whatsapp is null or char_length(regexp_replace(whatsapp, '\D', '', 'g')) <= 13);
 exception when duplicate_object or undefined_object then null; end $$;
 
 do $$
