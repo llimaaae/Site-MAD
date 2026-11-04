@@ -105,6 +105,17 @@ module.exports = async (req, res) => {
   const insta = linkPerfil(lead.instagram);
   const painel = SITE_URL + '/admin.html';
 
+  // 4.1) Campos do formulário simplificado (com compatibilidade
+  //      com os antigos da versão em 2 partes, se presentes).
+  const investeOu = lead.investe_marketing || lead.investimento || '';
+  const interesses = Array.isArray(lead.interesses)
+    ? lead.interesses
+    : (lead.interesses ? [String(lead.interesses)] : []);
+  const servicoOu = lead.servico || (interesses.length ? interesses.join(', ') : '');
+  const dataHora = lead.created_at
+    ? new Date(lead.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+    : '';
+
   // 5) Monta o corpo do e-mail — TODOS os campos passam por escaparHtml
   const linha = (label, valor) =>
     '<tr>' +
@@ -119,15 +130,17 @@ module.exports = async (req, res) => {
 
   const html =
     '<div style="background:#0d1424;color:#ffffff;font-family:Arial,sans-serif;padding:24px;border-radius:12px;">' +
-      '<h2 style="color:#009FE3;margin:0 0 16px;">Novo lead — Diagnóstico gratuito</h2>' +
+      '<h2 style="color:#009FE3;margin:0 0 16px;">Novo lead — Site MAD</h2>' +
       '<table style="font-size:14px;border-collapse:collapse;">' +
         linha('Nome', lead.nome) +
         linha('Empresa', lead.empresa) +
         linha('WhatsApp', lead.whatsapp) +
         linha('Instagram', lead.instagram) +
-        linha('Cidade', lead.cidade) +
-        linha('Investe em marketing', lead.investimento) +
-        linha('O que procura', lead.servico) +
+        (lead.email ? linha('E-mail', lead.email) : '') +
+        (investeOu ? linha('Investe em marketing', investeOu) : '') +
+        (servicoOu ? linha('Interesses', servicoOu) : '') +
+        (lead.cidade ? linha('Cidade', lead.cidade) : '') +
+        (dataHora ? linha('Data e hora', dataHora) : '') +
       '</table>' +
       '<p style="margin:16px 0 8px;font-size:14px;">' + links.join(' · ') + '</p>' +
     '</div>';
@@ -138,9 +151,11 @@ module.exports = async (req, res) => {
     'Empresa: ' + (lead.empresa || '—') + '\n' +
     'WhatsApp: ' + (lead.whatsapp || '—') + '\n' +
     'Instagram: ' + (lead.instagram || '—') + '\n' +
-    'Cidade: ' + (lead.cidade || '—') + '\n' +
-    'Investe em marketing: ' + (lead.investimento || '—') + '\n' +
-    'O que procura: ' + (lead.servico || '—') + '\n\n' +
+    'E-mail: ' + (lead.email || '—') + '\n' +
+    'Investe em marketing: ' + (investeOu || '—') + '\n' +
+    'Interesses: ' + (servicoOu || '—') + '\n' +
+    (lead.cidade ? 'Cidade: ' + lead.cidade + '\n' : '') +
+    'Data e hora: ' + (dataHora || '—') + '\n\n' +
     (whats ? 'WhatsApp: ' + whats + '\n' : '') +
     (insta ? 'Instagram: ' + insta + '\n' : '') +
     'Painel de leads: ' + painel + '\n';
@@ -154,9 +169,9 @@ module.exports = async (req, res) => {
         'Authorization': 'Bearer ' + RESEND_KEY
       },
       body: JSON.stringify({
-        from: 'onboarding@resend.dev', // provisório até verificar o domínio (passo 3)
+        from: 'onboarding@resend.dev', // provisório até dominínio verificado no Resend
         to: [LEAD_EMAIL],
-        subject: 'Novo lead: ' + limparAssunto(lead.nome || lead.empresa),
+        subject: 'Novo lead: ' + limparAssunto((lead.nome || '') + ' - ' + (lead.empresa || '')),
         html: html,
         text: textoPuro
       })

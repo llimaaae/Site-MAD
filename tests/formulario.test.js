@@ -228,7 +228,9 @@ test('webhook notifica-lead envia e-mail via Resend', async () => {
   assert.strictEqual(estado.emails.length, 1);
   const email = estado.emails[0];
   assert.strictEqual(email.to[0], 'mad@exemplo.com');
+  assert.ok(email.subject.startsWith('Novo lead: '));
   assert.ok(email.subject.includes('Ana Souza'));
+  assert.ok(email.subject.includes('Clínica Aurora'));
   assert.ok(email.text.includes('12981156417')); // whatsapp limpo
   assert.ok(email.text.includes('@clinicaaurora'));
 });
