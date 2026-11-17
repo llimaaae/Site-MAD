@@ -8,3 +8,7 @@ node_modules/
 playwright-form.js
 resultados.txt
 opencode.json
+.vercel
+
+.wrangler/
+dist/
